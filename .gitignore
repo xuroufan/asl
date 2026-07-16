@@ -31,3 +31,8 @@ __pycache__/
 !debug.keystore
 **/build/
 .kotlin/
+
+# Keystore / signing keys
+*.keystore
+*.jks
+release.keystore

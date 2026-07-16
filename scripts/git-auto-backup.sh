@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # git-auto-backup.sh — 自动检测变更并提交备份
-# 由 launchd 定时触发，每 30 分钟运行一次
+# 由 cron 定时触发，每 10 小时运行一次
 
 set -euo pipefail
 
