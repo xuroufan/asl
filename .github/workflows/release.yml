@@ -61,13 +61,13 @@ jobs:
 
       # ---- 构建 ----
       - name: Run checks
-        run: ./gradlew lintDevDebug --no-daemon --stacktrace
+        run: ./gradlew lintDevDebug --no-daemon --no-configuration-cache --stacktrace
 
       - name: Run unit tests
-        run: ./gradlew testDevDebugUnitTest --no-daemon --stacktrace
+        run: ./gradlew testDevDebugUnitTest --no-daemon --no-configuration-cache --stacktrace
 
       - name: Build Release AAB (all flavors)
-        run: ./gradlew bundleRelease --no-daemon --stacktrace
+        run: ./gradlew bundleRelease --no-daemon --no-configuration-cache --stacktrace
 
       # ---- 收集构建产物 ----
       - name: Collect AABs
@@ -76,7 +76,7 @@ jobs:
           find app/build/outputs/bundle -name "*.aab" -exec cp {} release-artifacts/ \;
 
       - name: Build release APKs
-        run: ./gradlew assembleRelease --no-daemon --stacktrace || true
+        run: ./gradlew assembleRelease --no-daemon --no-configuration-cache --stacktrace || true
 
       # ---- GitHub Release ----
       - name: Create Release
