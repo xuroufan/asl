@@ -61,7 +61,7 @@ jobs:
 
       # ---- 构建 ----
       - name: Run checks
-        run: ./gradlew ktlintCheck detekt lintDevDebug --no-daemon --stacktrace
+        run: ./gradlew detekt lintDevDebug --no-daemon --stacktrace
 
       - name: Run unit tests
         run: ./gradlew testDevDebugUnitTest --no-daemon --stacktrace

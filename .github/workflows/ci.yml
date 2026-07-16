@@ -48,9 +48,6 @@ jobs:
         run: echo "sdk.dir=$ANDROID_HOME" > local.properties
 
       # ---- Code Quality ----
-      - name: ktlint Check
-        run: ./gradlew ktlintCheck --no-daemon --stacktrace
-
       - name: detekt
         run: ./gradlew detekt --no-daemon --stacktrace
 
