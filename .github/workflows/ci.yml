@@ -1,0 +1,82 @@
+# CI: Pull Request & Push to main
+# 每次提交自动验证：代码检查 → 单元测试 → 构建 Debug APK
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Lint & Test & Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.gradle/configuration-cache
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts', '**/gradle-wrapper.properties', '**/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # 生成 minimal local.properties（GitHub runner 的 SDK 路径）
+      - name: Create local.properties
+        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+
+      # ---- Code Quality ----
+      - name: ktlint Check
+        run: ./gradlew ktlintCheck --no-daemon --stacktrace
+
+      - name: detekt
+        run: ./gradlew detekt --no-daemon --stacktrace
+
+      - name: Lint
+        run: ./gradlew lintDevDebug --no-daemon --stacktrace
+
+      # ---- Unit Tests ----
+      - name: Unit Tests (Dev Debug)
+        run: ./gradlew testDevDebugUnitTest --no-daemon --stacktrace
+
+      # ---- Build ----
+      - name: Build Dev Debug APK
+        run: ./gradlew assembleDevDebug --no-daemon --stacktrace
+
+      # ---- Upload artifacts ----
+      - name: Upload Dev Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: asl-dev-debug-${{ github.sha }}
+          path: app/build/outputs/apk/dev/debug/*.apk
+          retention-days: 7
+
+      - name: Upload Lint Report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report-${{ github.sha }}
+          path: app/build/reports/lint-results-*
+          retention-days: 7
