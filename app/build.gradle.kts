@@ -13,28 +13,26 @@ android {
     // ========== 签名配置（从环境变量读取，CI/CD 场景使用） ==========
     val keystorePath = System.getenv("KEYSTORE_FILE")
     val keystorePassword = System.getenv("KEYSTORE_PASSWORD")
-    val keyAlias = System.getenv("KEY_ALIAS")
-    val keyPassword = System.getenv("KEY_PASSWORD")
+    val envKeyAlias = System.getenv("KEY_ALIAS")
+    val envKeyPassword = System.getenv("KEY_PASSWORD")
 
     val hasSigningConfig = keystorePath != null && keystorePath.isNotBlank() &&
         keystorePassword != null && keystorePassword.isNotBlank() &&
-        keyAlias != null && keyAlias.isNotBlank() &&
-        keyPassword != null && keyPassword.isNotBlank()
+        envKeyAlias != null && envKeyAlias.isNotBlank() &&
+        envKeyPassword != null && envKeyPassword.isNotBlank()
 
     if (hasSigningConfig) {
-        signingConfigs {
-            create("release") {
-                storeFile = file(keystorePath!!)
-                storePassword = keystorePassword!!
-                keyAlias = keyAlias!!
-                keyPassword = keyPassword!!
-                enableV1Signing = true
-                enableV2Signing = true
-            }
+        val releaseSigningConfig = signingConfigs.create("release") {
+            storeFile = file(keystorePath!!)
+            storePassword = keystorePassword!!
+            keyAlias = envKeyAlias!!
+            keyPassword = envKeyPassword!!
+            enableV1Signing = true
+            enableV2Signing = true
         }
         buildTypes {
             getByName("release") {
-                signingConfig = signingConfigs.getByName("release")
+                signingConfig = releaseSigningConfig
             }
         }
     }
@@ -181,7 +179,5 @@ dependencies {
         exclude(group = "com.google.dagger", module = "hilt-android")
     }
     kspAndroidTest("com.google.dagger:hilt-android-compiler:2.53.1")
-                signingConfig = signingConfigs.getByName("release")
-            }
-        }
+
     }
