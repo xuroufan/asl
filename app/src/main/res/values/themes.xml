@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 基础 Material3 主题 -->
+    <style name="Theme.BlackFuture" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/background_dark</item>
+        <item name="android:navigationBarColor">@color/background_dark</item>
+    </style>
+
+    <!-- Splash 主题 -->
+    <style name="Theme.BlackFuture.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/background_dark</item>
+        <item name="postSplashScreenTheme">@style/Theme.BlackFuture</item>
+    </style>
+</resources>

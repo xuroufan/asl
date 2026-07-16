@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ASL</string>
+    <string name="app_name_en">ASL</string>
+
+    <!-- Login Page -->
+    <string name="login_title">Login</string>
+    <string name="login_account">Account</string>
+    <string name="login_account_hint">Enter account</string>
+    <string name="login_password">Password</string>
+    <string name="login_password_hint">Enter password</string>
+    <string name="login_captcha">Verification Code</string>
+    <string name="login_captcha_hint">Enter verification code</string>
+    <string name="login_button">Sign In</string>
+    <string name="login_remember_device">Remember device</string>
+    <string name="login_simulate_tip">Simulated trading environment, no real funds required</string>
+    <string name="login_forgot_password">Forgot password?</string>
+    <string name="login_register">Create Account</string>
+    <string name="login_error_empty_account">Please enter account</string>
+    <string name="login_error_empty_password">Please enter password</string>
+    <string name="login_error_invalid">Invalid account or password</string>
+
+    <!-- Market Page -->
+    <string name="market_title">Market</string>
+    <string name="market_overview">Market Overview</string>
+    <string name="market_contract">Contract</string>
+    <string name="market_contract_name">Contract Name</string>
+    <string name="market_last_price">Last Price</string>
+    <string name="market_change">Change</string>
+    <string name="market_change_percent">Change%</string>
+    <string name="market_open">Open</string>
+    <string name="market_high">High</string>
+    <string name="market_low">Low</string>
+    <string name="market_volume">Volume</string>
+    <string name="market_turnover">Turnover</string>
+    <string name="market_period_1m">1m</string>
+    <string name="market_period_5m">5m</string>
+    <string name="market_period_15m">15m</string>
+    <string name="market_period_30m">30m</string>
+    <string name="market_period_1h">1H</string>
+    <string name="market_period_4h">4H</string>
+    <string name="market_period_1d">1D</string>
+    <string name="market_period_1w">1W</string>
+    <string name="market_bids">Bids</string>
+    <string name="market_asks">Asks</string>
+    <string name="market_trades">Trades</string>
+    <string name="market_price">Price</string>
+    <string name="market_quantity">Qty</string>
+    <string name="market_time">Time</string>
+    <string name="market_search_hint">Search contract symbol or name</string>
+    <string name="market_up_count">Up</string>
+    <string name="market_down_count">Down</string>
+    <string name="market_flat_count">Flat</string>
+    <string name="market_no_match">No matching contracts</string>
+    <string name="market_no_data">No market data</string>
+    <string name="market_all">All</string>
+
+    <!-- Trading Page -->
+    <string name="trading_title">Trade</string>
+    <string name="trading_buy">Buy</string>
+    <string name="trading_sell">Sell</string>
+    <string name="trading_price">Price</string>
+    <string name="trading_price_hint">Enter price</string>
+    <string name="trading_quantity">Qty</string>
+    <string name="trading_quantity_hint">Enter quantity</string>
+    <string name="trading_order_type">Order Type</string>
+    <string name="trading_limit">Limit</string>
+    <string name="trading_market">Market</string>
+    <string name="trading_stop">Stop</string>
+    <string name="trading_stop_loss">Stop Loss</string>
+    <string name="trading_take_profit">Take Profit</string>
+    <string name="trading_counter_price">Counter Price</string>
+    <string name="trading_market_price">Market Price</string>
+    <string name="trading_estimated_total">Est. Total</string>
+    <string name="trading_submit">Submit Order</string>
+    <string name="trading_confirm_title">Confirm Order</string>
+    <string name="trading_confirm_buy">Confirm Buy</string>
+    <string name="trading_confirm_sell">Confirm Sell</string>
+    <string name="trading_cancel_order">Cancel</string>
+    <string name="trading_order_success">Order submitted</string>
+    <string name="trading_order_failed">Order failed</string>
+    <string name="trading_too_frequent">Too many attempts, please try again later</string>
+    <string name="trading_recent_orders">Open Orders</string>
+    <string name="trading_confirm_detail_direction">Direction</string>
+    <string name="trading_confirm_detail_contract">Contract</string>
+    <string name="trading_confirm_detail_type">Type</string>
+    <string name="trading_confirm_detail_price">Price</string>
+    <string name="trading_confirm_detail_quantity">Qty</string>
+    <string name="trading_confirm_detail_total">Total</string>
+
+    <!-- Position Page -->
+    <string name="position_title">Positions</string>
+    <string name="position_total_equity">Total Equity</string>
+    <string name="position_available">Available</string>
+    <string name="position_risk_ratio">Risk Ratio</string>
+    <string name="position_margin">Margin</string>
+    <string name="position_position_count">Positions</string>
+    <string name="position_unrealized_pnl">Unrealized PnL</string>
+    <string name="position_pnl_rate">PnL%</string>
+    <string name="position_header_contract">Contract</string>
+    <string name="position_header_direction">Direction</string>
+    <string name="position_header_quantity">Qty</string>
+    <string name="position_header_entry_price">Entry Price</string>
+    <string name="position_header_market_price">Market Price</string>
+    <string name="position_header_pnl">Unrealized PnL</string>
+    <string name="position_header_leverage">Leverage</string>
+    <string name="position_close">Close</string>
+    <string name="position_close_all">Close All</string>
+    <string name="position_history">Order History</string>
+    <string name="position_no_positions">No open positions</string>
+    <string name="position_long">Long</string>
+    <string name="position_short">Short</string>
+    <string name="position_close_confirm">Confirm Close</string>
+    <string name="position_close_success">Position closed</string>
+    <string name="position_close_failed">Close failed</string>
+
+    <!-- Settings Page -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_zh">简体中文</string>
+    <string name="settings_language_zh_tw">繁體中文</string>
+    <string name="settings_language_en">English</string>
+    <string name="settings_language_dialog_title">Select Language</string>
+    <string name="settings_notification">Notifications</string>
+    <string name="settings_notification_price">Price Alerts</string>
+    <string name="settings_notification_trade">Trade Notifications</string>
+    <string name="settings_notification_system">System Notifications</string>
+    <string name="settings_about">About</string>
+    <string name="settings_about_version">Version</string>
+    <string name="settings_logout">Log Out</string>
+    <string name="settings_logout_confirm">Are you sure you want to log out?</string>
+    <string name="settings_account">Account Settings</string>
+    <string name="settings_security">Security</string>
+    <string name="settings_help">Help Center</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_dark">Dark Mode</string>
+    <string name="settings_theme_light">Light Mode</string>
+    <string name="settings_theme_system">System Default</string>
+
+    <!-- Common Components -->
+    <string name="common_loading">Loading…</string>
+    <string name="common_retry">Retry</string>
+    <string name="common_network_error">Network error. Please check your connection.</string>
+    <string name="common_network_timeout">Request timed out. Please try again.</string>
+    <string name="common_confirm">Confirm</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_save">Save</string>
+    <string name="common_delete">Delete</string>
+    <string name="common_close">Close</string>
+    <string name="common_done">Done</string>
+    <string name="common_refresh">Refresh</string>
+    <string name="common_search">Search</string>
+    <string name="common_clear">Clear</string>
+    <string name="common_error">Error</string>
+    <string name="common_unknown_error">Unknown error</string>
+    <string name="common_success">Success</string>
+    <string name="common_no_data">No data</string>
+    <string name="common_try_again">Please try again later</string>
+</resources>
