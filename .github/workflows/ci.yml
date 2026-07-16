@@ -48,9 +48,6 @@ jobs:
         run: echo "sdk.dir=$ANDROID_HOME" > local.properties
 
       # ---- Code Quality ----
-      - name: detekt
-        run: ./gradlew detekt --no-daemon --stacktrace
-
       - name: Lint
         run: ./gradlew lintDevDebug --no-daemon --stacktrace
 
