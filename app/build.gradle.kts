@@ -9,8 +9,16 @@ plugins {
     // alias(libs.plugins.firebase.services) # skip google-services for debug
 }
 
-// ========== 应用签名配置（从环境变量读取） ==========
-apply(from = "signing.gradle")
+// ========== 签名配置（从环境变量读取，CI/CD 场景使用） ==========
+val keystorePath = System.getenv("KEYSTORE_FILE")
+val keystorePassword = System.getenv("KEYSTORE_PASSWORD")
+val keyAlias = System.getenv("KEY_ALIAS")
+val keyPassword = System.getenv("KEY_PASSWORD")
+
+val hasSigningConfig = keystorePath != null && keystorePath.isNotBlank() &&
+    keystorePassword != null && keystorePassword.isNotBlank() &&
+    keyAlias != null && keyAlias.isNotBlank() &&
+    keyPassword != null && keyPassword.isNotBlank()
 
 android {
     namespace = "com.hackfuture.trading"
@@ -156,3 +164,20 @@ dependencies {
     }
     kspAndroidTest("com.google.dagger:hilt-android-compiler:2.53.1")
 }
+    if (hasSigningConfig) {
+        signingConfigs {
+            create("release") {
+                storeFile = file(keystorePath!!)
+                storePassword = keystorePassword!!
+                keyAlias = keyAlias!!
+                keyPassword = keyPassword!!
+                enableV1Signing = true
+                enableV2Signing = true
+            }
+        }
+        buildTypes {
+            getByName("release") {
+                signingConfig = signingConfigs.getByName("release")
+            }
+        }
+    }
