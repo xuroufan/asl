@@ -39,3 +39,4 @@ release.keystore
 
 # Event journals (root level)
 events/journal-*.dat
+backend/infrastructure/certs/

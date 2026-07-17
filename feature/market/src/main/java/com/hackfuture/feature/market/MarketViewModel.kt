@@ -60,15 +60,22 @@ class MarketViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
             try {
-                // 1. Try AllTick real-time API
+                // 1. Try backend API
+                val result = apiService.getAllQuotes()
+                if (result.code == 200) {
+                    val json = com.hackfuture.core.network.di.NetworkModule.provideJson()
+                    val data = result.parseDataList<com.hackfuture.core.model.MarketData>(json)
+                    if (data != null) {
+                        _state.update { it.copy(isLoading = false, marketDataList = data) }
+                        return@launch
+                    }
+                }
+                // 2. Fallback: AllTick real-time API
                 val symbol = _state.value.selectedSymbol
                 val allTickResp = allTickApiService.getRealTime(symbol = symbol.toAllTickSymbol())
-                val data = allTickResp.data
-                if (allTickResp.ret == 0 && data.isNotEmpty()) {
+                if (allTickResp.ret == 0 && allTickResp.data.isNotEmpty()) {
                     val md = allTickResp.data.first().toMarketData()
                     _state.update { it.copy(isLoading = false, marketDataList = listOf(md)) }
-                } else {
-                    _state.update { it.copy(isLoading = false) }
                 }
                 webSocketManager.subscribe("${symbol.lowercase()}@ticker")
                 webSocketManager.subscribe("${symbol.lowercase()}@depth20")

@@ -31,6 +31,9 @@ interface ApiService {
     @GET(ApiConstants.Endpoints.MARKET_TICKER)
     suspend fun getAllTickers(): ApiResult
 
+    @GET(ApiConstants.Endpoints.MARKET_ALL_QUOTES)
+    suspend fun getAllQuotes(): ApiResult
+
     @GET(ApiConstants.Endpoints.MARKET_CANDLES)
     suspend fun getCandles(
         @Query("symbol") symbol: String,

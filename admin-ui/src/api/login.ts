@@ -52,11 +52,11 @@ export function refreshTokenApi(refreshToken: string) {
 
 
 export function registerApi(data: { username: string; email: string; password: string; confirmPassword: string; inviteCode?: string }) {
-  return request.post<any, { code: number; msg: string; data: LoginResponse }>('/admin/auth/register', data)
+  return request.post<any, { code: number; msg: string; data: LoginResponse }>('/auth/register', data)
 }
 
 export function googleOauthApi(idToken: string, email?: string, name?: string) {
-  return request.post<any, { code: number; msg: string; data: LoginResponse }>('/admin/auth/oauth/google', { idToken, email, name })
+  return request.post<any, { code: number; msg: string; data: LoginResponse }>('/auth/oauth/google', { idToken, email, name })
 }
 
 export function logoutApi() {

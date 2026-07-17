@@ -26,7 +26,7 @@ spring:
       mode: never
   cloud:
     nacos:
-      enabled: true
+      enabled: false
       discovery:
         enabled: true
       config:
@@ -48,7 +48,7 @@ spring:
 # ============ RocketMQ ============
 rocketmq:
   # 是否启用 RocketMQ（生产环境设置为 true，需要启动 RocketMQ 服务端）
-  enabled: true
+  enabled: false
   name-server: localhost:9876
   producer:
     group: order-producer-group

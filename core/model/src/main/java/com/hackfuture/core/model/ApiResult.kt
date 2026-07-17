@@ -19,7 +19,16 @@ data class ApiResult(
     val code: Int = 200,
     val msg: String = "success",
     val data: JsonElement? = null,
-)
+) {
+    /** 将 data 解析为具体类型的列表 */
+    inline fun <reified T> parseDataList(json: Json): List<T>? {
+        return try {
+            data?.let { json.decodeFromJsonElement(serializer<List<T>>(), it) }
+        } catch (e: Exception) {
+            null
+        }
+    }
+}
 
 /** 将 ApiResult.data 解析为具体类型 */
 inline fun <reified T> ApiResult.parseData(json: Json): T? {
@@ -29,3 +38,5 @@ inline fun <reified T> ApiResult.parseData(json: Json): T? {
         null
     }
 }
+
+

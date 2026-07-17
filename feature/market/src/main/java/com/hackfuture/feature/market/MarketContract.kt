@@ -61,11 +61,15 @@ data class MarketTrade(
 
 object MarketSymbols {
     val DEFAULT = listOf(
-        "BTCUSDT" to "BTC/USDT",
-        "ETHUSDT" to "ETH/USDT",
-        "BNBUSDT" to "BNB/USDT",
-        "SOLUSDT" to "SOL/USDT",
-        "XRPUSDT" to "XRP/USDT",
-        "DOGEUSDT" to "DOGE/USDT",
+        "HSI" to "恒生指数",
+        "ES" to "标普500",
+        "NQ" to "纳斯达克",
+        "YM" to "道琼斯",
+        "GC" to "黄金",
+        "CL" to "原油",
+        "EUR" to "欧元",
+        "JPY" to "日元",
+        "BTC" to "比特币",
+        "ETH" to "以太坊",
     )
 }

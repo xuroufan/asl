@@ -32,6 +32,8 @@ public class WebSecurityConfig {
             "/api/v1/admin/auth/captcha",
             "/api/v1/admin/auth/register",
             "/api/v1/admin/auth/oauth/**",
+            "/actuator/health",
+            "/actuator/prometheus",
             "/doc.html",
             "/swagger-ui/**",
             "/v3/api-docs/**",
@@ -47,7 +49,6 @@ public class WebSecurityConfig {
             .csrf(csrf -> csrf.disable())
             // 无状态会话
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            // 请求授权
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(WHITE_LIST).permitAll()
                 .anyRequest().authenticated()

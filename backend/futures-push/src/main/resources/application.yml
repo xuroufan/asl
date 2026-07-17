@@ -32,6 +32,7 @@ spring:
 
 # ============ RocketMQ 配置 ============
 rocketmq:
+  enabled: false
   name-server: 127.0.0.1:9876
   consumer:
     group: futures-push-consumer

@@ -1,0 +1,346 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "enable": true,
+        "iconColor": "rgba(255, 96, 96, 1)",
+        "name": "\u670d\u52a1\u542f\u505c",
+        "query": "changes(up[5m]) > 0",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "id": 4381876273582080,
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "max": 1000,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": -1
+              },
+              {
+                "color": "orange",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 200
+              }
+            ]
+          },
+          "unit": "\u00b5s"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(matching_latency_seconds_bucket[5m])) by (le)) * 1000000",
+          "legendFormat": "P99"
+        }
+      ],
+      "title": "\u64ae\u5408\u5ef6\u8fdf (P99 \u03bcs)",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4
+      },
+      "targets": [
+        {
+          "expr": "orderbook_bid_depth",
+          "legendFormat": "\u4e70\u5355\u6df1\u5ea6"
+        }
+      ],
+      "title": "\u8ba2\u5355\u7c3f\u6df1\u5ea6 (\u4e70\u5355)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4
+      },
+      "targets": [
+        {
+          "expr": "orderbook_ask_depth",
+          "legendFormat": "\u5356\u5355\u6df1\u5ea6"
+        }
+      ],
+      "title": "\u8ba2\u5355\u7c3f\u6df1\u5ea6 (\u5356\u5355)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4
+      },
+      "targets": [
+        {
+          "expr": "position_total",
+          "legendFormat": "\u6301\u4ed3\u6570"
+        }
+      ],
+      "title": "\u5f53\u524d\u6301\u4ed3\u603b\u6570",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "max": 200,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": -1
+              },
+              {
+                "color": "orange",
+                "value": 80
+              },
+              {
+                "color": "red",
+                "value": 120
+              }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4
+      },
+      "targets": [
+        {
+          "expr": "max(risk_ratio)",
+          "legendFormat": "\u6700\u9ad8\u98ce\u9669\u5ea6"
+        }
+      ],
+      "title": "\u98ce\u9669\u5ea6 (\u6700\u5927)",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4
+      },
+      "targets": [
+        {
+          "expr": "sum(user_equity)",
+          "legendFormat": "\u603b\u6743\u76ca"
+        }
+      ],
+      "title": "\u603b\u6743\u76ca (USDT)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6
+      },
+      "targets": [
+        {
+          "expr": "rate(order_total[1m])",
+          "legendFormat": "\u8ba2\u5355\u7387"
+        },
+        {
+          "expr": "rate(match_total[1m])",
+          "legendFormat": "\u6210\u4ea4\u7387"
+        }
+      ],
+      "title": "\u8ba2\u5355\u5904\u7406\u901f\u7387 (\u7b14/\u79d2)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6
+      },
+      "targets": [
+        {
+          "expr": "order_status_total",
+          "legendFormat": "{{status}}"
+        }
+      ],
+      "title": "\u8ba2\u5355\u72b6\u6001\u5206\u5e03",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "\u00b5s"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12
+      },
+      "targets": [
+        {
+          "expr": "sum by(le) (rate(matching_latency_seconds_bucket[5m]))",
+          "legendFormat": "{{le}}"
+        }
+      ],
+      "title": "\u64ae\u5408\u5ef6\u8fdf\u5206\u5e03 (\u03bcs)",
+      "type": "heatmap"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "cpm"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6
+      },
+      "targets": [
+        {
+          "expr": "rate(fund_flow_count_total[5m]) * 60",
+          "legendFormat": "{{type}}"
+        }
+      ],
+      "title": "\u8d44\u91d1\u5212\u8f6c\u6d41\u6c34 (\u7b14/\u5206\u949f)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": -1
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          },
+          "unit": "ops"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6
+      },
+      "targets": [
+        {
+          "expr": "rate(risk_alert_count[5m])",
+          "legendFormat": "\u544a\u8b66\u7387"
+        }
+      ],
+      "title": "\u98ce\u63a7\u544a\u8b66\u6570",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "15s",
+  "tags": [
+    "futures",
+    "trading",
+    "core"
+  ],
+  "templating": {
+    "list": [
+      {
+        "allValue": ".*",
+        "includeAll": true,
+        "label": "\u5408\u7ea6",
+        "multi": true,
+        "name": "symbol",
+        "query": "label_values(order_total, symbol)",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "title": "\u671f\u8d27\u4ea4\u6613\u5e73\u53f0 - \u4ea4\u6613\u6838\u5fc3\u76d1\u63a7",
+  "uid": "futures-trading-core",
+  "version": 1
+}
