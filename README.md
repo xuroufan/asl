@@ -121,4 +121,6 @@ GitHub Actions 自动运行 CI（push/PR 到 main）：lint → 单元测试 →
 
 ---
 
-*内部项目*
+## 许可证
+
+[MIT](LICENSE)
