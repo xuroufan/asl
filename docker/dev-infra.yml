@@ -1,0 +1,83 @@
+networks:
+  futures-net:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:
+
+services:
+  mysql:
+    platform: linux/arm64/v8
+    image: mysql:8.0
+    container_name: asl-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_USER: futures
+      MYSQL_PASSWORD: futures123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./scripts/init-schema.sql:/docker-entrypoint-initdb.d/init-schema.sql:ro
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password
+    networks:
+      - futures-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot123"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    platform: linux/arm64/v8
+    image: redis:7-alpine
+    container_name: asl-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass futures123 --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - futures-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "futures123", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  prometheus:
+    platform: linux/arm64/v8
+    image: prom/prometheus:latest
+    container_name: asl-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus:/etc/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - futures-net
+    restart: unless-stopped
+
+  grafana:
+    platform: linux/arm64/v8
+    image: grafana/grafana:latest
+    container_name: asl-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+    networks:
+      - futures-net
+    restart: unless-stopped

@@ -1,0 +1,31 @@
+
+# ============================================================
+# 清结算服务 - 开发环境配置
+# Data ID: futures-settlement-dev.yaml | Group: DEFAULT_GROUP
+# ============================================================
+
+server:
+  port: 8087
+
+futures:
+  settlement:
+    schedule:
+      settlement-time: "16:30"             # 每日结算时间
+      timezone: Asia/Shanghai
+      enable-auto-settlement: false        # 开发环境不自动结算
+    fee:
+      commission-rate: 0.0003              # 手续费率 0.03%
+      min-commission: 5.00                 # 最低手续费
+      exchange-fee: 2.00                   # 交易所规费
+      clearing-fee: 1.00                   # 结算费
+    reporting:
+      generate-monthly: true
+      generate-daily: true
+      output-format: PDF
+    margin-optimization:
+      enable-cross-margin: false           # 跨品种保证金优化
+      max-offset-rate: 0.80                # 最大冲抵率
+
+logging:
+  level:
+    com.futures.settlement: DEBUG

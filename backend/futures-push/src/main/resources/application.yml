@@ -1,0 +1,55 @@
+server:
+  port: 8093
+
+spring:
+  application:
+    name: futures-push
+  autoconfigure:
+    exclude:
+    - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+    - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+    - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+  cloud:
+    sentinel:
+      enabled: false
+    nacos:
+      config:
+      discovery:
+        enabled: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ${REDIS_PASSWORD:futures123}
+      database: 1
+      timeout: 3000ms
+      jedis:
+        pool:
+          max-active: 8
+          max-idle: 4
+          min-idle: 2
+          max-wait: 2000ms
+
+# ============ RocketMQ 配置 ============
+rocketmq:
+  name-server: 127.0.0.1:9876
+  consumer:
+    group: futures-push-consumer
+    pull-batch-size: 32
+
+logging:
+  level:
+    com.futures: DEBUG
+
+# ============ Actuator / Prometheus 监控 ============
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    export:
+      prometheus:
+        enabled: true

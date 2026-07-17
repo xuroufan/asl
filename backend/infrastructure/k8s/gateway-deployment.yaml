@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: futures-gateway
+  namespace: futures-platform
+  labels:
+    app: futures-gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: futures-gateway
+  template:
+    metadata:
+      labels:
+        app: futures-gateway
+    spec:
+      containers:
+        - name: gateway
+          image: futures-platform/futures-gateway:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8088
+              protocol: TCP
+          env:
+            - name: NACOS_ADDR
+              value: "nacos-service:8848"
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+            - name: JAVA_OPTS
+              value: "-Xms256m -Xmx512m -Dspring.classformat.ignore=true"
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8088
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: futures-gateway
+  namespace: futures-platform
+spec:
+  selector:
+    app: futures-gateway
+  ports:
+    - port: 8088
+      targetPort: 8088
+      nodePort: 30080
+  type: NodePort

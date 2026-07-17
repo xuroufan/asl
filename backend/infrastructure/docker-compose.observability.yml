@@ -1,0 +1,68 @@
+version: '3.8'
+
+networks:
+  futures-net:
+    driver: bridge
+
+volumes:
+  es_data:
+  logstash_data:
+
+services:
+  elasticsearch:
+    image: elasticsearch:7.14.0
+    container_name: futures-es
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    networks:
+      - futures-net
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+
+  logstash:
+    image: logstash:7.14.0
+    container_name: futures-logstash
+    environment:
+      - LS_JAVA_OPTS=-Xms256m -Xmx256m
+    ports:
+      - "5044:5044"
+      - "9600:9600"
+    volumes:
+      - ./logstash/pipeline/futures.conf:/usr/share/logstash/pipeline/futures.conf:ro
+    depends_on:
+      - elasticsearch
+    networks:
+      - futures-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+
+  kibana:
+    image: kibana:7.14.0
+    container_name: futures-kibana
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - futures-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.25'

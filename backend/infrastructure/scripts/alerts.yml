@@ -1,0 +1,180 @@
+groups:
+  - name: futures-platform-alerts
+    interval: 30s
+    rules:
+
+      # ============ 1. 服务可用性告警 ============
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.service }} 服务不可用"
+          description: "{{ $labels.instance }} 已宕机超过1分钟"
+
+      - alert: ServiceRepeatedlyFlapping
+        expr: changes(up[30m]) > 5
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.service }} 服务反复重启"
+          description: "30分钟内状态变化超过5次，请检查OOM或配置问题"
+
+      # ============ 2. JVM 告警 ============
+      - alert: HighHeapMemoryUsage
+        expr: jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"} > 0.85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.service }} 堆内存使用超过85%"
+          description: "当前使用率: {{ $value | humanizePercentage }}"
+
+      - alert: CriticalHeapMemoryUsage
+        expr: jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"} > 0.95
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.service }} 堆内存使用超过95%"
+          description: "即将OOM！当前使用率: {{ $value | humanizePercentage }}"
+
+      - alert: HighNonHeapMemoryUsage
+        expr: jvm_memory_used_bytes{area="nonheap"} / jvm_memory_max_bytes{area="nonheap"} > 0.85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.service }} 非堆内存使用超过85%"
+          description: "元空间/代码缓存可能泄漏"
+
+      - alert: FrequentGarbageCollection
+        expr: rate(jvm_gc_pause_seconds_count[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.instance }} GC频率过高"
+          description: "每分钟GC次数: {{ $value | humanize }}"
+
+      - alert: LongGcPause
+        expr: rate(jvm_gc_pause_seconds_sum[5m]) / rate(jvm_gc_pause_seconds_count[5m]) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.service }} GC暂停时间过长"
+          description: "平均GC暂停: {{ $value }}s"
+
+      # ============ 3. API 性能告警 ============
+      - alert: SlowHttpRequests
+        expr: rate(http_server_requests_seconds_sum[5m]) / rate(http_server_requests_seconds_count[5m]) > 3
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.service }} 接口响应慢"
+          description: "平均响应时间: {{ $value }}s, 阈值: 3s"
+
+      - alert: HighErrorRate
+        expr: rate(http_server_requests_seconds_count{status=~"5.."}[5m]) / rate(http_server_requests_seconds_count[5m]) > 0.05
+        for: 3m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.service }} 错误率超过5%"
+          description: "当前5xx错误率: {{ $value | humanizePercentage }}"
+
+      - alert: High4xxRate
+        expr: rate(http_server_requests_seconds_count{status=~"4.."}[5m]) / rate(http_server_requests_seconds_count[5m]) > 0.20
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.service }} 4xx错误率过高"
+          description: "当前4xx错误率: {{ $value | humanizePercentage }}，可能遭到扫描攻击"
+
+      # ============ 4. 业务指标告警 ============
+      - alert: MatchingOrderRejected
+        expr: rate(matching_orders_rejected_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "撮合引擎订单被拒"
+          description: "过去5分钟内有订单被撮合引擎拒绝，请检查订单参数"
+
+      - alert: MatchingOrderUnmatched
+        expr: rate(matching_orders_unmatched_total[5m]) > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "大量订单未成交"
+          description: "过去5分钟未成交量大于100笔，检查流动性或行情"
+
+      - alert: OrderBookDepthSpike
+        expr: orderbook_depth_spread > orderbook_depth_spread_offset * 5
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "订单簿深度异常"
+          description: "买卖价差异常扩大，检查市场数据"
+
+      - alert: FundFreezeFailed
+        expr: rate(fund_freeze_failed_total[5m]) > 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "资金冻结失败"
+          description: "过去5分钟有资金冻结失败，检查余额或风控"
+
+      - alert: RiskWarningRatioExceeded
+        expr: risk_warning_ratio > 0.9
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "风控警戒线被触发"
+          description: "用户风控指标超过90%，需关注强平风险"
+
+      # ============ 5. 基础设施告警 ============
+      - alert: HighDiskUsage
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "磁盘空间不足（低于10%）"
+          description: "挂载点 {{ $labels.mountpoint }} 剩余空间不足10%"
+
+      - alert: HighCpuUsage
+        expr: (1 - avg by(instance)(rate(node_cpu_seconds_total{mode="idle"}[5m]))) > 0.85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU使用率超过85%"
+          description: "当前CPU使用率: {{ $value | humanizePercentage }}"
+
+      # ============ 6. 网关告警 ============
+      - alert: GatewayRouteDown
+        expr: rate(gateway_routes_unhealthy_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "网关路由不可达"
+          description: "后端服务路由 {{ $labels.route_id }} 不可达"
+
+      - alert: GatewayRateLimitExceeded
+        expr: rate(gateway_request_rejected_total[1m]) > 100
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "网关限流触发频繁"
+          description: "每分钟请求被限流超过100次"

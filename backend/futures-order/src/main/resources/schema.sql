@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS t_order (
+    id BIGINT PRIMARY KEY,
+    order_id VARCHAR(32) UNIQUE NOT NULL,
+    user_id BIGINT NOT NULL,
+    symbol VARCHAR(20) NOT NULL,
+    direction INT NOT NULL,
+    order_type INT NOT NULL,
+    price DECIMAL(20,2),
+    volume INT NOT NULL,
+    filled_volume INT DEFAULT 0,
+    avg_price DECIMAL(20,2),
+    stop_price DECIMAL(20,2),
+    take_profit_price DECIMAL(20,2),
+    parent_id BIGINT,
+    status INT DEFAULT 0,
+    client_order_id VARCHAR(64),
+    time_in_force VARCHAR(10) DEFAULT 'DAY',
+    reject_reason VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

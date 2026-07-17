@@ -1,0 +1,68 @@
+server:
+  port: 8087
+spring:
+  application:
+    name: futures-settlement
+  datasource:
+    url: jdbc:mysql://localhost:3306/futures_settlement?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8&rewriteBatchedStatements=true
+    username: futures
+    password: ${DB_PASSWORD:futures123}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 30000
+      test-on-borrow: true
+      validation-query: SELECT 1
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      filters: stat,wall
+      connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+  sql:
+    init:
+      mode: never
+  cloud:
+    sentinel:
+      enabled: true
+    nacos:
+      discovery:
+        enabled: true
+      config:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ${REDIS_PASSWORD:futures123}
+      database: 0
+      timeout: 3000ms
+      jedis:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 4
+          max-wait: 2000ms
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: auto
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+logging:
+  level:
+    com.futures: DEBUG
+
+# ============ Actuator / Prometheus 监控 ============
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    export:
+      prometheus:
+        enabled: true

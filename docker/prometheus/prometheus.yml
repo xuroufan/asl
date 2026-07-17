@@ -1,0 +1,69 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'futures-gateway'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8088']
+        labels: { service: 'futures-gateway', tier: 'gateway' }
+
+  - job_name: 'futures-order'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8081']
+        labels: { service: 'futures-order', tier: 'core' }
+
+  - job_name: 'futures-matching'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8082']
+        labels: { service: 'futures-matching', tier: 'core' }
+
+  - job_name: 'futures-account'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8083']
+        labels: { service: 'futures-account', tier: 'core' }
+
+  - job_name: 'futures-fund'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8084']
+        labels: { service: 'futures-fund', tier: 'core' }
+
+  - job_name: 'futures-risk'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8085']
+        labels: { service: 'futures-risk', tier: 'core' }
+
+  - job_name: 'futures-market'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8086']
+        labels: { service: 'futures-market', tier: 'core' }
+
+  - job_name: 'futures-settlement'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8087']
+        labels: { service: 'futures-settlement', tier: 'core' }
+
+  - job_name: 'futures-push'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8093']
+        labels: { service: 'futures-push', tier: 'core' }
+
+  - job_name: 'futures-admin'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8099']
+        labels: { service: 'futures-admin', tier: 'admin' }

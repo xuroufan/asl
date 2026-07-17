@@ -1,0 +1,53 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: futures-matching
+  autoconfigure:
+    exclude:
+    - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+    - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+    - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+    - org.apache.rocketmq.spring.autoconfigure.RocketMQAutoConfiguration
+  cloud:
+    sentinel:
+      enabled: true
+    nacos:
+      config:
+        enabled: true
+      discovery:
+        enabled: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ${REDIS_PASSWORD:futures123}
+      database: 0
+      timeout: 3000ms
+      jedis:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 4
+          max-wait: 2000ms
+matching:
+  journal:
+    batch-size: 100
+  snapshot:
+    interval-seconds: 300
+    event-threshold: 10000
+  mq:
+    enabled: true
+logging:
+  level:
+    com.futures.matching: DEBUG
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus

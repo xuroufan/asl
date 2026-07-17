@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: futures-matching
+
+  config:
+    import:
+      #  - optional:nacos:  # disabled for local dev
+
+  cloud:
+    nacos:
+      config:
+        enabled: false
+      discovery:
+        enabled: false
+        register-enabled: false
+        server-addr: 127.0.0.1:8848
+        username: ${NACOS_USER:nacos}
+        password: ${NACOS_PASSWORD:nacos}
+        namespace: public
+  profiles:
+    active: dev

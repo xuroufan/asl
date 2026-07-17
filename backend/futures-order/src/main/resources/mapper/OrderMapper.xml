@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.futures.order.mapper.OrderMapper">
+
+    <!-- 通用结果映射 -->
+    <resultMap id="BaseResultMap" type="com.futures.order.entity.OrderEntity">
+        <id column="id" property="id" />
+        <result column="order_id" property="orderId" />
+        <result column="user_id" property="userId" />
+        <result column="symbol" property="symbol" />
+        <result column="direction" property="direction"
+                typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+        <result column="order_type" property="orderType"
+                typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+        <result column="price" property="price" />
+        <result column="volume" property="volume" />
+        <result column="filled_volume" property="filledVolume" />
+        <result column="avg_price" property="avgPrice" />
+        <result column="stop_price" property="stopPrice" />
+        <result column="take_profit_price" property="takeProfitPrice" />
+        <result column="parent_id" property="parentId" />
+        <result column="status" property="status"
+                typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+        <result column="client_order_id" property="clientOrderId" />
+        <result column="time_in_force" property="timeInForce" />
+        <result column="reject_reason" property="rejectReason" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+    </resultMap>
+
+    <!-- 全字段列表 -->
+    <sql id="BaseColumns">
+        id, order_id, user_id, symbol, direction, order_type,
+        price, volume, filled_volume, avg_price, stop_price, take_profit_price,
+        parent_id, status, client_order_id, time_in_force, reject_reason,
+        created_at, updated_at
+    </sql>
+
+    <!-- 根据 orderId 查询 -->
+    <select id="selectByOrderId" resultMap="BaseResultMap" parameterType="string">
+        SELECT <include refid="BaseColumns" />
+        FROM t_order
+        WHERE order_id = #{orderId}
+    </select>
+
+    <!-- 批量查询用户活跃订单 -->
+    <select id="selectActiveOrders" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns" />
+        FROM t_order
+        WHERE user_id = #{userId}
+          AND status IN (0, 1) <!-- PENDING=0, PARTIAL=1 -->
+        <if test="symbol != null and symbol != ''">
+            AND symbol = #{symbol}
+        </if>
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 分页查询历史委托 -->
+    <select id="selectHistoryOrders" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns" />
+        FROM t_order
+        WHERE user_id = #{userId}
+        <if test="symbol != null and symbol != ''">
+            AND symbol = #{symbol}
+        </if>
+        <if test="startDate != null">
+            AND created_at &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND created_at &lt;= #{endDate}
+        </if>
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 按订单号查询父单下所有子单 -->
+    <select id="selectChildrenByParentId" resultMap="BaseResultMap" parameterType="long">
+        SELECT <include refid="BaseColumns" />
+        FROM t_order
+        WHERE parent_id = #{parentId}
+        ORDER BY created_at ASC
+    </select>
+
+</mapper>

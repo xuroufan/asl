@@ -36,3 +36,6 @@ __pycache__/
 *.keystore
 *.jks
 release.keystore
+
+# Event journals (root level)
+events/journal-*.dat

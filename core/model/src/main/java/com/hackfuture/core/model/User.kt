@@ -2,67 +2,60 @@ package com.hackfuture.core.model
 
 import kotlinx.serialization.Serializable
 
-/**
- * 用户账户模型
- */
+// ============ 用户模型（对齐管理后台响应） ============
+
 @Serializable
 data class User(
-    val id: String,
-    val username: String,
-    val displayName: String,
-    val email: String,
+    val userId: Int = 0,
+    val username: String = "",
+    val nickname: String = "",
+    val avatar: String? = null,
+    val email: String? = null,
     val phone: String? = null,
-    val avatarUrl: String? = null,
-    val accountStatus: AccountStatus = AccountStatus.ACTIVE,
-    val kycLevel: KycLevel = KycLevel.NONE,
-    val createdAt: Long,
-    val updatedAt: Long,
+    val status: Int = 0,
+    val roles: List<String> = emptyList(),
+    val menus: List<RouterVO> = emptyList(),
+    val loginIp: String? = null,
+    val loginDate: String? = null,
 ) {
-    val isVerified: Boolean
-        get() = kycLevel >= KycLevel.BASIC
-
-    val isActive: Boolean
-        get() = accountStatus == AccountStatus.ACTIVE
+    val displayName: String get() = nickname.ifEmpty { username }
+    val avatarUrl: String? get() = avatar
+    val isActive: Boolean get() = status == 0
 }
 
 @Serializable
-enum class AccountStatus {
-    ACTIVE,
-    SUSPENDED,
-    FROZEN,
-    CLOSED,
-}
+data class RouterVO(
+    val id: Int = 0,
+    val parentId: Int = 0,
+    val name: String = "",
+    val path: String = "",
+    val component: String? = null,
+    val meta: RouterMeta = RouterMeta(),
+    val children: List<RouterVO> = emptyList(),
+)
 
 @Serializable
-enum class KycLevel {
-    NONE,
-    BASIC,
-    ADVANCED,
-}
+data class RouterMeta(
+    val title: String = "",
+    val icon: String = "",
+    val hideMenu: Boolean = false,
+)
 
-/**
- * 登录请求
- */
+// ============ 认证模型（与 ApiService 通信） ============
+
 @Serializable
 data class LoginRequest(
     val username: String,
     val password: String,
 )
 
-/**
- * 登录响应
- */
 @Serializable
 data class LoginResponse(
-    val accessToken: String,
-    val refreshToken: String,
-    val expiresIn: Long,
-    val user: User,
+    val accessToken: String = "",
+    val refreshToken: String = "",
+    val user: User? = null,
 )
 
-/**
- * 注册请求
- */
 @Serializable
 data class RegisterRequest(
     val username: String,
@@ -71,20 +64,14 @@ data class RegisterRequest(
     val phone: String? = null,
 )
 
-/**
- * Token 刷新请求
- */
 @Serializable
 data class RefreshTokenRequest(
     val refreshToken: String,
 )
 
-/**
- * Token 刷新响应
- */
 @Serializable
 data class RefreshTokenResponse(
     val accessToken: String,
     val refreshToken: String,
-    val expiresIn: Long,
+    val expiresIn: Long = 86400L,
 )

@@ -1,0 +1,32 @@
+
+# ============================================================
+# 风控引擎 - 开发环境配置
+# Data ID: futures-risk-dev.yaml | Group: DEFAULT_GROUP
+# ============================================================
+
+server:
+  port: 8085
+
+futures:
+  risk:
+    margin:
+      default-rate: 0.05                   # 默认保证金率 5%
+      max-rate: 0.20                       # 最高保证金率
+      min-rate: 0.02                       # 最低保证金率(优质客户)
+    thresholds:
+      warning-ratio: 0.80                  # 风险度 >= 80% 预警
+      no-new-position-ratio: 1.00          # 风险度 >= 100% 禁止开仓
+      liquidation-ratio: 1.20              # 风险度 >= 120% 强平
+      safe-ratio: 1.00                     # 强平后恢复至100%
+    liquidation:
+      batch-size: 10                       # 每批强平手数
+      interval-seconds: 5                  # 强平间隔
+      use-market-order: true               # 强平使用市价单
+    daily-loss-limit-ratio: 0.02           # 日内亏损限额(初始资金2%)
+    monitor:
+      interval-seconds: 1                  # 风控检查间隔
+      enable-auto-liquidation: true        # 启用自动强平
+
+logging:
+  level:
+    com.futures.risk: DEBUG

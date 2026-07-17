@@ -1,0 +1,37 @@
+datadir="/var/lib/proxysql"
+
+admin_variables=
+{
+    admin_credentials="admin:admin"
+    mysql_ifaces="0.0.0.0:6032"
+}
+
+mysql_variables=
+{
+    threads=4
+    max_connections=2048
+    interfaces="0.0.0.0:6033"
+    default_schema="information_schema"
+    server_version="8.0.35"
+    connect_timeout_server=10000
+    monitor_connect_interval=60000
+    monitor_ping_interval=10000
+    commands_stats=true
+}
+
+mysql_servers =
+(
+    { address="mysql-master", port=3306, hostgroup=0, weight=1 },
+    { address="mysql-slave",  port=3306, hostgroup=1, weight=1 }
+)
+
+mysql_query_rules =
+(
+    { rule_id=1, active=1, match_pattern="^SELECT .*", destination_hostgroup=1, apply=1 },
+    { rule_id=2, active=1, match_pattern=".*", destination_hostgroup=0, apply=1 }
+)
+
+mysql_users =
+(
+    { username="futures", password="futures123", default_hostgroup=0, transaction_persistent=1 }
+)

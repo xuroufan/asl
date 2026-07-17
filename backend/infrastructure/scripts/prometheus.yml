@@ -1,0 +1,94 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+rule_files:
+  - "alerts.yml"
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+  # ============ 期货交易平台微服务 ============
+  - job_name: 'futures-gateway'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['127.0.0.1:8080']
+        labels:
+          service: 'futures-gateway'
+          tier: 'gateway'
+
+  - job_name: 'futures-order'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['127.0.0.1:8081']
+        labels:
+          service: 'futures-order'
+          tier: 'core'
+
+  - job_name: 'futures-matching'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['127.0.0.1:8082']
+        labels:
+          service: 'futures-matching'
+          tier: 'core'
+
+  - job_name: 'futures-account'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['127.0.0.1:8083']
+        labels:
+          service: 'futures-account'
+          tier: 'core'
+
+  - job_name: 'futures-fund'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['127.0.0.1:8084']
+        labels:
+          service: 'futures-fund'
+          tier: 'core'
+
+  - job_name: 'futures-risk'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['127.0.0.1:8085']
+        labels:
+          service: 'futures-risk'
+          tier: 'core'
+
+  - job_name: 'futures-market'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['127.0.0.1:8086']
+        labels:
+          service: 'futures-market'
+          tier: 'core'
+
+  - job_name: 'futures-settlement'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['127.0.0.1:8087']
+        labels:
+          service: 'futures-settlement'
+          tier: 'core'
+
+  # ============ 基础设施 ============
+  - job_name: 'nacos'
+    metrics_path: '/nacos/actuator/prometheus'
+    static_configs:
+      - targets: ['nacos:8848']
+        labels:
+          service: 'nacos'

@@ -1,0 +1,27 @@
+
+# ============================================================
+# 账户服务 - 开发环境配置
+# Data ID: futures-account-dev.yaml | Group: DEFAULT_GROUP
+# ============================================================
+
+server:
+  port: 8083
+
+futures:
+  account:
+    kyc:
+      enabled: true
+      ocr-endpoint: https://ocr.example.com/identify
+      max-retries: 3
+    auth:
+      token-expire-minutes: 120
+      refresh-expire-days: 7
+      max-login-failures: 5
+      lock-minutes: 15
+    register:
+      require-phone-verify: true
+      require-email-verify: false
+
+logging:
+  level:
+    com.futures.account: DEBUG

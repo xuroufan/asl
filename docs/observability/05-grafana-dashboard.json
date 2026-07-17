@@ -1,0 +1,107 @@
+{
+  "dashboard": {
+    "title": "期货交易核心指标大盘",
+    "tags": ["trading", "futures"],
+    "timezone": "Asia/Shanghai",
+    "panels": [
+      {
+        "title": "订单 QPS",
+        "type": "graph",
+        "targets": [{
+          "expr": "sum(rate(order_place_total[1m]))",
+          "legendFormat": "下单QPS"
+        }],
+        "yaxes": [{ "format": "ops" }]
+      },
+      {
+        "title": "下单延迟 P50 / P95 / P99",
+        "type": "graph",
+        "targets": [
+          { "expr": "histogram_quantile(0.5, rate(order_latency_seconds_bucket[5m]))", "legendFormat": "P50" },
+          { "expr": "histogram_quantile(0.95, rate(order_latency_seconds_bucket[5m]))", "legendFormat": "P95" },
+          { "expr": "histogram_quantile(0.99, rate(order_latency_seconds_bucket[5m]))", "legendFormat": "P99" }
+        ],
+        "yaxes": [{ "format": "s" }]
+      },
+      {
+        "title": "撮合延迟 P50 / P95 / P99 (μs)",
+        "type": "graph",
+        "targets": [
+          { "expr": "histogram_quantile(0.5, rate(matching_latency_microseconds_bucket[5m]))", "legendFormat": "P50" },
+          { "expr": "histogram_quantile(0.95, rate(matching_latency_microseconds_bucket[5m]))", "legendFormat": "P95" },
+          { "expr": "histogram_quantile(0.99, rate(matching_latency_microseconds_bucket[5m]))", "legendFormat": "P99" }
+        ],
+        "yaxes": [{ "format": "µs" }]
+      },
+      {
+        "title": "接口错误率（按服务）",
+        "type": "graph",
+        "targets": [{
+          "expr": "sum(rate(http_requests_duration_seconds_count{status=~\"5..\"}[5m])) by (service) / sum(rate(http_requests_duration_seconds_count[5m])) by (service)",
+          "legendFormat": "{{service}}"
+        }],
+        "yaxes": [{ "format": "percentunit" }]
+      },
+      {
+        "title": "WebSocket 连接数",
+        "type": "graph",
+        "targets": [{ "expr": "websocket_connection_total", "legendFormat": "连接数" }]
+      },
+      {
+        "title": "撮合吞吐量",
+        "type": "graph",
+        "targets": [{ "expr": "rate(matching_throughput_count[1m])", "legendFormat": "成交/秒" }],
+        "yaxes": [{ "format": "ops" }]
+      },
+      {
+        "title": "资金冻结错误数",
+        "type": "graph",
+        "targets": [{ "expr": "rate(fund_freeze_errors_total[5m])", "legendFormat": "错误/秒" }]
+      },
+      {
+        "title": "活跃订单数",
+        "type": "graph",
+        "targets": [{ "expr": "order_active_total", "legendFormat": "活跃订单" }]
+      },
+      {
+        "title": "GC 暂停时间",
+        "type": "graph",
+        "targets": [{
+          "expr": "rate(jvm_gc_pause_seconds_sum[5m])",
+          "legendFormat": "{{service}}"
+        }]
+      },
+      {
+        "title": "堆内存使用率",
+        "type": "graph",
+        "targets": [{
+          "expr": "jvm_memory_used_bytes{area=\"heap\"} / jvm_memory_max_bytes{area=\"heap\"}",
+          "legendFormat": "{{service}}"
+        }],
+        "yaxes": [{ "format": "percentunit" }]
+      },
+      {
+        "title": "数据库连接池使用率",
+        "type": "graph",
+        "targets": [{
+          "expr": "hikaricp_active_connections / hikaricp_max_connections",
+          "legendFormat": "{{pool}}"
+        }],
+        "yaxes": [{ "format": "percentunit" }]
+      },
+      {
+        "title": "主从延迟",
+        "type": "graph",
+        "targets": [{ "expr": "mysql_slave_status_seconds_behind_master", "legendFormat": "{{instance}}" }],
+        "yaxes": [{ "format": "s" }]
+      }
+    ],
+    "rows": [
+      { "title": "交易核心", "panels": [0, 1] },
+      { "title": "撮合引擎", "panels": [2, 5] },
+      { "title": "业务错误", "panels": [3, 6] },
+      { "title": "连接与活跃", "panels": [4, 7] },
+      { "title": "JVM & 数据库", "panels": [8, 9, 10, 11] }
+    ]
+  }
+}

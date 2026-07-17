@@ -1,0 +1,70 @@
+
+# ============================================================
+# API 网关 - 开发环境配置
+# Data ID: futures-gateway-dev.yaml | Group: DEFAULT_GROUP
+# ============================================================
+
+server:
+  port: 8088
+
+spring:
+  main:
+    web-application-type: reactive
+  cloud:
+    gateway:
+      routes:
+        - id: auth-route
+          uri: lb://futures-account
+          predicates:
+            - Path=/api/v1/auth/**
+          filters:
+            - StripPrefix=1
+        - id: order-route
+          uri: lb://futures-order
+          predicates:
+            - Path=/api/v1/order/**
+        - id: matching-route
+          uri: lb://futures-matching
+          predicates:
+            - Path=/api/v1/matching/**
+        - id: account-route
+          uri: lb://futures-account
+          predicates:
+            - Path=/api/v1/account/**
+        - id: fund-route
+          uri: lb://futures-fund
+          predicates:
+            - Path=/api/v1/fund/**
+        - id: risk-route
+          uri: lb://futures-risk
+          predicates:
+            - Path=/api/v1/risk/**
+        - id: market-route
+          uri: lb://futures-market
+          predicates:
+            - Path=/api/v1/market/**
+        - id: settlement-route
+          uri: lb://futures-settlement
+          predicates:
+            - Path=/api/v1/settlement/**
+      default-filters:
+        - name: Retry
+          args:
+            retries: 3
+            statuses: BAD_GATEWAY, SERVICE_UNAVAILABLE
+        - name: DedupeResponseHeader
+          args:
+            strategy: RETAIN_FIRST
+      loadbalancer:
+        retry:
+          enabled: true
+
+jwt:
+  secret: ${JWT_SECRET:FuturesPlatformSecretKey2024ForJWT}
+  expiration: 7200000          # 2小时
+  refresh-expiration: 604800000 # 7天
+
+logging:
+  level:
+    com.futures.gateway: DEBUG
+    org.springframework.cloud.gateway: INFO

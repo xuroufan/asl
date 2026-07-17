@@ -9,6 +9,9 @@ import com.hackfuture.core.model.LoginResponse
 import com.hackfuture.core.model.User
 import com.hackfuture.core.model.ApiResult
 import com.hackfuture.core.model.parseData
+import com.hackfuture.core.network.AuthInterceptor
+import com.hackfuture.core.network.security.TokenManager
+import com.hackfuture.core.network.websocket.WebSocketManager
 import kotlinx.serialization.json.Json
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -25,6 +28,9 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     private val apiService: ApiService,
     private val json: Json,
+    private val tokenManager: TokenManager,
+    private val authInterceptor: AuthInterceptor,
+    private val webSocketManager: WebSocketManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AuthState())
@@ -52,15 +58,26 @@ class AuthViewModel @Inject constructor(
                 if (result.code == 200) {
                     val loginResponse = result.parseData<LoginResponse>(json)
                     if (loginResponse != null) {
+                        // 保存 token
+                        tokenManager.saveTokens(
+                            accessToken = loginResponse.accessToken,
+                            refreshToken = loginResponse.refreshToken,
+                            expiresIn = 86400L
+                        )
+                        authInterceptor.updateToken(loginResponse.accessToken)
+
+                        // 连接 WebSocket
+                        webSocketManager.connect()
+
                         _state.update {
                             it.copy(
                                 isLoading = false,
                                 isLoggedIn = true,
-                                user = loginResponse.user,
+                                user = loginResponse.user ?: User(),
                                 loginError = null,
                             )
                         }
-                        _effect.send(AuthEffect.NavigateToHome(loginResponse.user))
+                        _effect.send(AuthEffect.NavigateToHome(loginResponse.user ?: User()))
                     } else {
                         throw Exception("解析登录响应失败")
                     }
@@ -83,17 +100,24 @@ class AuthViewModel @Inject constructor(
             try {
                 val result = apiService.register(RegisterRequest(username, email, password))
                 if (result.code == 200) {
-                    val user = result.parseData<User>(json)
-                    if (user != null) {
+                    val loginResponse = result.parseData<LoginResponse>(json)
+                    if (loginResponse != null) {
+                        tokenManager.saveTokens(
+                            accessToken = loginResponse.accessToken,
+                            refreshToken = loginResponse.refreshToken,
+                            expiresIn = 86400L
+                        )
+                        authInterceptor.updateToken(loginResponse.accessToken)
+                        webSocketManager.connect()
                         _state.update {
                             it.copy(
                                 isLoading = false,
                                 isLoggedIn = true,
-                                user = user,
+                                user = loginResponse.user ?: User(),
                                 registerError = null,
                             )
                         }
-                        _effect.send(AuthEffect.NavigateToHome(user))
+                        _effect.send(AuthEffect.NavigateToHome(loginResponse.user ?: User()))
                     } else {
                         throw Exception("解析注册响应失败")
                     }

@@ -1,0 +1,50 @@
+# ============================================================
+# RocketMQ & Kafka Prometheus 监控配置
+# 将此文件内容追加到 infrastructure/scripts/prometheus.yml 中
+# ============================================================
+
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # ─── RocketMQ Exporter ───
+  # 部署方式: docker run -d --name rocketmq-exporter -p 5557:5557 \
+  #   -e "ROCKETMQ_NAMESRV_ADDR=rocketmq-namesrv:9876" \
+  #   apache/rocketmq-exporter:latest
+  - job_name: 'rocketmq'
+    static_configs:
+      - targets: ['rocketmq-exporter:5557']
+    metrics_path: '/metrics'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'futures-rocketmq'
+
+  # ─── Kafka Exporter ───
+  # 部署方式: docker run -d --name kafka-exporter -p 9308:9308 \
+  #   danielqsj/kafka-exporter --kafka.server=kafka:9092
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['kafka-exporter:9308']
+    metrics_path: '/metrics'
+
+  # ─── JMX Exporter (Java 服务 RocketMQ Metrics) ───
+  # 每个 Java 服务启用的 RocketMQ 指标
+  - job_name: 'rocketmq-application'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets:
+          - 'host.docker.internal:8081'   # order
+          - 'host.docker.internal:8082'   # matching
+          - 'host.docker.internal:8083'   # account
+          - 'host.docker.internal:8084'   # fund
+          - 'host.docker.internal:8085'   # risk
+          - 'host.docker.internal:8086'   # market
+          - 'host.docker.internal:8087'   # settlement
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'futures-${1}'
+        regex: '.*:(\\d+)'

@@ -1,0 +1,41 @@
+
+# ============================================================
+# 行情服务 - 开发环境配置
+# Data ID: futures-market-dev.yaml | Group: DEFAULT_GROUP
+# ============================================================
+
+server:
+  port: 8086
+
+futures:
+  market:
+    simulator:
+      enabled: true                        # 使用行情模拟器
+      base-price: 4500.00                  # 基准价格(ES)
+      drift-mu: 0.05                       # 漂移率
+      volatility-sigma: 0.20               # 波动率
+      open-gap-range: 0.01                 # 开盘跳空范围
+      step-interval-seconds: 5             # 行情步进间隔
+    kline:
+      intervals:                            # 支持的K线周期
+        - 1m
+        - 5m
+        - 15m
+        - 30m
+        - 1h
+        - 4h
+        - 1d
+      max-candles: 1000                    # 最大缓存K线数
+    websocket:
+      heartbeat-interval-seconds: 30       # WebSocket心跳间隔
+      max-subscriptions-per-client: 50     # 每客户端最大订阅数
+    data-source:
+      type: simulator                      # simulator | real | hybrid
+      real-data:
+        enabled: false
+        provider: cme
+        api-key: ${CME_API_KEY:}
+
+logging:
+  level:
+    com.futures.market: DEBUG

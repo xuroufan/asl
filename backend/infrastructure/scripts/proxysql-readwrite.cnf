@@ -1,0 +1,41 @@
+# ============================================================
+# ProxySQL 读写分离配置
+# ============================================================
+# 部署:
+#   1. docker compose -f docker-compose.yml up -d proxysql
+#   2. mysql -h127.0.0.1 -P6032 -uradmin -pradmin < proxysql-readwrite.cnf
+# ============================================================
+
+-- 插入MySQL主从节点
+INSERT INTO mysql_servers (hostgroup_id, hostname, port, weight, comment)
+VALUES 
+    (0, 'futures-mysql-master', 3306, 100, '主库-读写'),
+    (1, 'futures-mysql-slave',  3306, 50,  '从库1-只读'),
+    (1, 'futures-mysql-slave2', 3306, 50,  '从库2-只读');
+
+-- 配置查询规则
+-- 规则匹配顺序: rule_id 从小到大
+INSERT INTO mysql_query_rules (rule_id, active, match_pattern, destination_hostgroup, apply, comment)
+VALUES
+    -- 写操作(INSERT/UPDATE/DELETE/REPLACE) → 主库
+    (1, 1, '^(INSERT|UPDATE|DELETE|REPLACE|TRUNCATE|DROP|CREATE|ALTER)', 0, 1, '写操作→主库'),
+    -- SELECT ... FOR UPDATE → 主库
+    (2, 1, '^SELECT.*FOR UPDATE', 0, 1, '锁读→主库'),
+    -- 事务内所有语句 → 主库(由ProxySQL自动检测)
+    -- 管理后台报表 → 从库
+    (10, 1, '^SELECT.*FROM t_oper_log|t_login_log|t_reconciliation', 1, 1, '报表查询→从库'),
+    -- 历史委托查询 → 从库
+    (11, 1, '^SELECT.*FROM t_order WHERE.*ORDER BY.*LIMIT', 1, 1, '历史委托→从库'),
+    -- 纯SELECT → 从库(读写分离)
+    (100, 1, '^SELECT', 1, 1, '读操作→从库');
+
+-- 配置连接池
+UPDATE mysql_users SET default_hostgroup = 0;  -- 默认主库
+LOAD MYSQL USERS TO RUNTIME;
+SAVE MYSQL USERS TO DISK;
+
+LOAD MYSQL SERVERS TO RUNTIME;
+SAVE MYSQL SERVERS TO DISK;
+
+LOAD MYSQL QUERY RULES TO RUNTIME;
+SAVE MYSQL QUERY RULES TO DISK;

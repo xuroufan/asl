@@ -1,0 +1,56 @@
+# =========================================================
+# AlertManager 通道配置 — Slack + 钉钉机器人
+# =========================================================
+# 使用方式:
+#   1. 将本文件内容合并到 alertmanager.yml 的 receivers 段
+#   2. 替换 webhook_url / token 为真实值
+#   3. 重启 AlertManager: docker restart futures-alertmanager
+# =========================================================
+
+# ─── Slack 告警通道 ───
+# 前置条件: 在 Slack 中创建 Incoming Webhook
+# Slack App → Incoming Webhooks → Add New Webhook
+# 参考: https://api.slack.com/messaging/webhooks
+#
+# 配置:
+# - name: slack-receiver
+#   slack_configs:
+#     - api_url: 'https://hooks.slack.com/services/T00/B00/xxxxx'
+#       channel: '#futures-alerts'
+#       send_resolved: true
+#       title: '{{ .GroupLabels.alertname }}'
+#       text: >-
+#         {{ range .Alerts }}
+#          *Severity:* {{ .Labels.severity }}
+#          *Service:* {{ .Labels.service }}
+#          *Message:* {{ .Annotations.description }}
+#         {{ end }}
+
+# ─── 钉钉机器人告警通道 ───
+# 前置条件: 在钉钉群中添加自定义机器人
+# 群设置 → 智能群助手 → 添加机器人 → 自定义
+# 安全设置: 建议启用 "加签" 方式
+#
+# 钉钉 AlertManager Webhook 适配器 (需额外部署):
+# https://github.com/timonwong/prometheus-webhook-dingtalk
+#
+# docker run -d --name dingtalk-hook \
+#   -p 8060:8060 \
+#   timonwong/prometheus-webhook-dingtalk:latest \
+#   --ding.profile="webhook1=https://oapi.dingtalk.com/robot/send?access_token=YOUR_TOKEN"
+#
+# 然后在 alertmanager.yml 中添加:
+# - name: dingtalk-receiver
+#   webhook_configs:
+#     - url: 'http://dingtalk-hook:8060/dingtalk/webhook1/send'
+#       send_resolved: true
+
+# ─── 电话告警通道（通过第三方服务） ───
+# 推荐方案: OneAlert / OpsGenie / PagerDuty
+# 以 PagerDuty 为例:
+# - name: pagerduty-critical
+#   pagerduty_configs:
+#     - routing_key: 'YOUR_PD_INTEGRATION_KEY'
+#       severity: 'critical'
+#       description: '{{ .GroupLabels.alertname }}'
+#       send_resolved: true

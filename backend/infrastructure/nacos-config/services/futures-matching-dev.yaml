@@ -1,0 +1,30 @@
+
+# ============================================================
+# 撮合引擎 - 开发环境配置
+# Data ID: futures-matching-dev.yaml | Group: DEFAULT_GROUP
+# ============================================================
+
+server:
+  port: 8082
+
+futures:
+  matching:
+    engine-type: in-memory                # in-memory: 内存撮合
+    order-book-depth: 10                  # 订单簿深度(每侧)
+    matching-interval-ms: 1               # 撮合间隔(毫秒)
+    max-orders-per-batch: 1000            # 每批最大处理订单数
+    use-disruptor: true                   # 使用LMAX Disruptor
+    disruptor:
+      buffer-size: 16384                  # RingBuffer大小(2的幂)
+      wait-strategy: busy-spin            # 等待策略
+    event-log:
+      enabled: true
+      flush-interval-ms: 100              # 刷新间隔
+      max-batch-size: 5000                # 最大批量写入
+    snapshot:
+      interval-orders: 10000              # 每N笔交易生成快照
+      interval-seconds: 300               # 每N秒生成快照
+
+logging:
+  level:
+    com.futures.matching: DEBUG

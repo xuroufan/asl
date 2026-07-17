@@ -1,0 +1,90 @@
+server:
+  port: 8088
+spring:
+  main:
+    web-application-type: reactive
+  application:
+    name: futures-gateway
+  cloud:
+    gateway:
+      routes:
+      - id: auth-route
+        uri: http://localhost:8083
+        predicates:
+        - Path=/api/v1/auth/**
+      - id: order-route
+        uri: http://localhost:8081
+        predicates:
+        - Path=/api/v1/order/**
+      - id: matching-route
+        uri: http://localhost:8082
+        predicates:
+        - Path=/api/v1/matching/**
+      - id: account-route
+        uri: http://localhost:8083
+        predicates:
+        - Path=/api/v1/account/**
+      - id: fund-route
+        uri: http://localhost:8084
+        predicates:
+        - Path=/api/v1/fund/**
+      - id: risk-route
+        uri: http://localhost:8085
+        predicates:
+        - Path=/api/v1/risk/**
+      - id: market-route
+        uri: http://localhost:8086
+        predicates:
+        - Path=/api/v1/market/**
+      - id: admin-route
+        uri: http://localhost:8099
+        predicates:
+        - Path=/api/v1/admin/**
+      - id: settlement-route
+        uri: http://localhost:8087
+        predicates:
+        - Path=/api/v1/settlement/**
+      - id: push-route
+        uri: http://localhost:8093
+        predicates:
+        - Path=/api/v1/push/**
+      - id: trade-route
+        uri: http://localhost:8083
+        predicates:
+        - Path=/api/v1/trade/**
+    sentinel:
+      enabled: false
+    nacos:
+      config:
+        enabled: false
+      discovery:
+        enabled: false
+  autoconfigure:
+    exclude:
+    - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+    - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ${REDIS_PASSWORD:futures123}
+      timeout: 5000ms
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 4
+logging:
+  level:
+    com.futures: DEBUG
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    export:
+      prometheus:
+        enabled: true

@@ -1,0 +1,46 @@
+server:
+  port: 8085
+spring:
+  application:
+    name: futures-risk
+  autoconfigure:
+    exclude:
+    - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+    - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+    - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+  cloud:
+    sentinel:
+      enabled: true
+    nacos:
+      config:
+      discovery:
+        enabled: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ${REDIS_PASSWORD:futures123}
+      database: 0
+      timeout: 3000ms
+      jedis:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 4
+          max-wait: 2000ms
+logging:
+  level:
+    com.futures: DEBUG
+
+# ============ Actuator / Prometheus 监控 ============
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    export:
+      prometheus:
+        enabled: true

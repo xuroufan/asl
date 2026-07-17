@@ -1,0 +1,28 @@
+
+# ============================================================
+# 资金服务 - 开发环境配置
+# Data ID: futures-fund-dev.yaml | Group: DEFAULT_GROUP
+# ============================================================
+
+server:
+  port: 8084
+
+futures:
+  fund:
+    initial-balance: 1000000.00            # 新用户初始资金
+    max-leverage: 20                       # 最大杠杆倍数
+    min-margin-rate: 0.05                  # 最低保证金率
+    currency: USD
+    deposit:
+      min-amount: 100.00                   # 最低入金金额
+      max-amount: 1000000.00               # 最高入金金额
+    withdraw:
+      min-amount: 50.00
+      max-amount: 500000.00
+      review-threshold: 50000.00           # 超过此金额需审核
+    optimistic-lock:
+      max-retries: 3                       # 乐观锁最大重试次数
+
+logging:
+  level:
+    com.futures.fund: DEBUG

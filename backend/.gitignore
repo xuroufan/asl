@@ -1,0 +1,36 @@
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+
+# Maven build outputs
+target/
+**/target/
+
+# Build artifacts
+*.jar
+*.tar.gz
+*.war
+
+# Nacos
+nacos-server/
+nacos/
+
+# Skywalking agent
+infrastructure/skywalking/
+
+# Backup files
+*.bak
+
+# Event journals
+events/journal-*.dat
+
+# Maven wrapper binary
+.mvn/wrapper/maven-wrapper.jar
+
+# Runtime data
+nacos-server/nacos/data/
+nacos-server/nacos/logs/

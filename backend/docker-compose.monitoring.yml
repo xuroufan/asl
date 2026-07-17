@@ -1,0 +1,111 @@
+networks:
+  futures-net:
+    name: futures-platform_default
+    external: true
+
+volumes:
+  loki_data:
+  prometheus_data:
+  grafana_data:
+
+services:
+  loki:
+    image: grafana/loki:2.9.4
+    container_name: futures-loki
+    user: root
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/loki-config.yaml
+    volumes:
+      - ./infrastructure/loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
+      - loki_data:/loki
+    networks:
+      - futures-net
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+
+  promtail:
+    image: grafana/promtail:2.9.4
+    container_name: futures-promtail
+    volumes:
+      - ./infrastructure/loki/promtail-config.yaml:/etc/promtail/promtail-config.yaml:ro
+      - /tmp:/tmp:ro
+      - /var/log:/var/log:ro
+    command: -config.file=/etc/promtail/promtail-config.yaml
+    depends_on:
+      - loki
+    networks:
+      - futures-net
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.2'
+
+  alertmanager:
+    image: prom/alertmanager:v0.26.0
+    container_name: futures-alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./infrastructure/scripts/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    networks:
+      - futures-net
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.2'
+
+  prometheus:
+    image: prom/prometheus:v2.50.1
+    container_name: futures-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infrastructure/scripts/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./infrastructure/scripts/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=15d'
+    networks:
+      - futures-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+
+  grafana:
+    image: grafana/grafana:10.4.2
+    container_name: futures-grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=futures123
+      - GF_INSTALL_PLUGINS=
+      - GF_SERVER_HTTP_PORT=3002
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./infrastructure/scripts/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
+      - ./infrastructure/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+      - loki
+    networks:
+      - futures-net
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'

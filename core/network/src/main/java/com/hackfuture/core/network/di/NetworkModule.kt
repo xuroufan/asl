@@ -2,6 +2,7 @@ package com.hackfuture.core.network.di
 
 import com.hackfuture.core.network.ApiConstants
 import com.hackfuture.core.network.ApiService
+import com.hackfuture.core.network.AuthInterceptor
 import com.hackfuture.core.network.alltick.AllTickApiService
 import com.hackfuture.core.network.alltick.AllTickConstants
 import com.hackfuture.core.network.auth.TokenAuthenticator
@@ -32,6 +33,9 @@ import javax.inject.Singleton
 object NetworkModule {
 
     @Provides @Singleton
+    fun provideAuthInterceptor(): AuthInterceptor = AuthInterceptor()
+
+    @Provides @Singleton
     fun provideJson(): Json = Json {
         ignoreUnknownKeys = true; isLenient = true
         encodeDefaults = true; coerceInputValues = true; prettyPrint = false
@@ -47,12 +51,14 @@ object NetworkModule {
             Class.forName("com.hackfuture.trading.BuildConfig")
                 .getField("DEBUG").getBoolean(null)
         } catch (_: Exception) { true }
+        val authInterceptor = AuthInterceptor()
         return OkHttpClient.Builder()
             .connectTimeout(ApiConstants.CONNECT_TIMEOUT, TimeUnit.SECONDS)
             .readTimeout(ApiConstants.READ_TIMEOUT, TimeUnit.SECONDS)
             .writeTimeout(ApiConstants.WRITE_TIMEOUT, TimeUnit.SECONDS)
             .certificatePinner(sslPinner.buildCertificatePinner(isDebug))
             .addInterceptor(logging)
+            .addInterceptor(authInterceptor)
             .addInterceptor { chain ->
                 chain.proceed(chain.request().newBuilder()
                     .header("Content-Type", "application/json")

@@ -1,0 +1,36 @@
+#!/bin/sh
+# ---------------------------------------------------------------------------
+# Maven Start Up Batch script
+#
+# Required ENV vars:
+# ------------------
+#   JAVA_HOME - location of a JDK home dir
+#
+# Optional ENV vars
+# -----------------
+#   M2_HOME - location of maven2's installed home dir
+#   MAVEN_OPTS - parameters passed to the Java VM when running Maven
+#   MAVEN_SKIP_RC - flag to disable loading of mavenrc files
+# ---------------------------------------------------------------------------
+
+MAVEN_HOME="${MAVEN_HOME:-$HOME/.m2/wrapper/dists/apache-maven-3.9.6}"
+MAVEN_OPTS="${MAVEN_OPTS:--Xmx512m}"
+APP_HOME=$(cd "$(dirname "$0")" && pwd)
+
+if [ -z "$JAVA_HOME" ]; then
+  java_executable=$(which java 2>/dev/null || /usr/libexec/java_home 2>/dev/null)
+  if [ -n "$java_executable" ]; then
+    export JAVA_HOME=$(/usr/libexec/java_home 2>/dev/null || echo "$(dirname $(dirname $(readlink -f $(which java))))")
+  fi
+  if [ -z "$JAVA_HOME" ]; then
+    echo "Error: JAVA_HOME is not set and no 'java' command could be found in your PATH."
+    exit 1
+  fi
+fi
+
+export JAVA_HOME
+exec "$JAVA_HOME/bin/java" $MAVEN_OPTS \
+  -classpath "$APP_HOME/.mvn/wrapper/maven-wrapper.jar" \
+  org.apache.maven.wrapper.MavenWrapperMain \
+  -Dmaven.wrapper.skipDownload=false \
+  "$@"

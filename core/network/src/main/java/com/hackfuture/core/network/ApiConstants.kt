@@ -14,9 +14,9 @@ object ApiConstants {
 
     object Endpoints {
         // Auth — 匹配 futures-account 模块
-        const val AUTH_LOGIN = "api/$API_VERSION/auth/login"
-        const val AUTH_REGISTER = "api/$API_VERSION/auth/register"
-        const val AUTH_REFRESH = "api/$API_VERSION/auth/refresh"
+        const val AUTH_LOGIN = "api/$API_VERSION/admin/auth/login"
+        const val AUTH_REGISTER = "api/$API_VERSION/admin/auth/register"
+        const val AUTH_REFRESH = "api/$API_VERSION/admin/auth/refresh"
 
         // Market — 匹配 futures-market 模块
         const val MARKET_QUOTE = "api/$API_VERSION/market/quote"

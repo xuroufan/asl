@@ -1,0 +1,63 @@
+# 网关 - 生产配置
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: auth-route
+          uri: lb://futures-account
+          predicates:
+            - Path=/api/v1/auth/**
+        - id: order-route
+          uri: lb://futures-order
+          predicates:
+            - Path=/api/v1/order/**
+        - id: matching-route
+          uri: lb://futures-matching
+          predicates:
+            - Path=/api/v1/matching/**
+        - id: account-route
+          uri: lb://futures-account
+          predicates:
+            - Path=/api/v1/account/**
+        - id: fund-route
+          uri: lb://futures-fund
+          predicates:
+            - Path=/api/v1/fund/**
+        - id: risk-route
+          uri: lb://futures-risk
+          predicates:
+            - Path=/api/v1/risk/**
+        - id: market-route
+          uri: lb://futures-market
+          predicates:
+            - Path=/api/v1/market/**
+        - id: settlement-route
+          uri: lb://futures-settlement
+          predicates:
+            - Path=/api/v1/settlement/**
+        - id: push-route
+          uri: lb://futures-push
+          predicates:
+            - Path=/api/v1/push/**
+      default-filters:
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter:
+              replenishRate: ${RATE_LIMIT_REPLENISH:100}
+              burstCapacity: ${RATE_LIMIT_BURST:200}
+              requestedTokens: 1
+
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD}
+
+server:
+  port: 8088
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus

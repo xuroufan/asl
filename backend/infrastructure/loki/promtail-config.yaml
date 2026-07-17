@@ -1,0 +1,96 @@
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: system-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: varlogs
+          __path__: /var/log/*.log
+
+  - job_name: futures-services
+    pipeline_stages:
+      - regex:
+          expression: '^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}[.,]\d{3})\s+\[(?P<thread>[^\]]+)\]\s+(?P<level>[A-Z]+)\s+(?P<logger>[^\s]+)\s+-\s+(?P<message>.*)'
+      - labels:
+          level:
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: futures-services
+          __path__: /tmp/fm-*.log
+
+  - job_name: futures-gateway
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: futures-gateway
+          service: gateway
+          __path__: /tmp/fm-gateway*.log
+
+  - job_name: futures-matching
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: futures-matching
+          service: matching
+          __path__: /tmp/fm-matching*.log
+
+  - job_name: futures-order
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: futures-order
+          service: order
+          __path__: /tmp/fm-order*.log
+
+  - job_name: futures-account
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: futures-account
+          service: account
+          __path__: /tmp/fm-account*.log
+
+  - job_name: futures-fund
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: futures-fund
+          service: fund
+          __path__: /tmp/fm-fund*.log
+
+  - job_name: futures-risk
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: futures-risk
+          service: risk
+          __path__: /tmp/fm-risk*.log
+
+  - job_name: futures-market
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: futures-market
+          service: market
+          __path__: /tmp/fm-market*.log
+
+  - job_name: futures-settlement
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: futures-settlement
+          service: settlement
+          __path__: /tmp/fm-settlement*.log

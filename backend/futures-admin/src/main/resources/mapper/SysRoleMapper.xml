@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.futures.admin.mapper.SysRoleMapper">
+    <select id="selectRolesByUserId" resultType="com.futures.admin.entity.SysRole">
+        SELECT r.* FROM sys_role r JOIN sys_user_role ur ON r.role_id = ur.role_id WHERE ur.user_id = #{userId} AND r.deleted = 0 AND r.status = 0
+    </select>
+    <insert id="insertUserRole">INSERT INTO sys_user_role (user_id, role_id) VALUES (#{userId}, #{roleId})</insert>
+   <delete id="deleteUserRoleByUserId">DELETE FROM sys_user_role WHERE user_id = #{userId}</delete>
+
+    <insert id="insertRoleMenu">INSERT INTO sys_role_menu (role_id, menu_id) VALUES (#{roleId}, #{menuId})</insert>
+    <delete id="deleteRoleMenuByRoleId">DELETE FROM sys_role_menu WHERE role_id = #{roleId}</delete>
+</mapper>

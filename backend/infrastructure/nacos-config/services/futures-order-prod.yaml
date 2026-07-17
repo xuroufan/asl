@@ -1,0 +1,15 @@
+# futures-order - 生产配置
+# 数据库/Redis密码从共享配置 futures-shared-prod.yaml 继承
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+logging:
+  level:
+    com.futures: WARN

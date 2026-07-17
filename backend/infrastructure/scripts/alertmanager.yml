@@ -1,0 +1,42 @@
+global:
+  resolve_timeout: 5m
+  smtp_smarthost: 'smtp.example.com:587'
+  smtp_from: 'alert@futures-platform.com'
+  smtp_auth_username: 'alert@futures-platform.com'
+  smtp_auth_password: '${SMTP_PASSWORD}'
+  smtp_require_tls: true
+
+route:
+  group_by: ['alertname', 'service', 'severity']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: 'default-receiver'
+  routes:
+    - match: { severity: critical }
+      receiver: 'critical-receiver'
+      repeat_interval: 1h
+    - match: { severity: warning }
+      receiver: 'warning-receiver'
+
+receivers:
+  - name: 'default-receiver'
+    email_configs:
+      - to: 'ops@futures-platform.com'
+        send_resolved: true
+    webhook_configs:
+      - url: 'http://webhook:8080/alert'
+        send_resolved: true
+
+  - name: 'critical-receiver'
+    email_configs:
+      - to: 'oncall@futures-platform.com'
+        send_resolved: true
+    webhook_configs:
+      - url: 'http://webhook:8080/alert/critical'
+        send_resolved: true
+
+  - name: 'warning-receiver'
+    email_configs:
+      - to: 'ops@futures-platform.com'
+        send_resolved: true

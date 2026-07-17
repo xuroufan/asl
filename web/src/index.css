@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { @apply border-gray-800; }
+  body {
+    @apply bg-[#0A0E1A] text-gray-100 antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+      'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    overflow-x: hidden;
+  }
+}
+
+@layer components {
+  /* Card styles */
+  .card {
+    @apply bg-[#0F1629] rounded-xl border border-gray-800/50;
+  }
+  .card-hover {
+    @apply card hover:border-gray-700/60 hover:bg-[#121A2E] transition-all duration-200;
+  }
+  .card-glow {
+    @apply card border-brand/10 shadow-[0_0_30px_-10px_rgba(79,140,247,0.15)];
+  }
+
+  /* Price colors */
+  .text-up { @apply text-[#FF6B6B]; }
+  .text-down { @apply text-[#00C853]; }
+  .bg-up { @apply bg-[#FF6B6B]/10; }
+  .bg-down { @apply bg-[#00C853]/10; }
+
+  /* Glass effect */
+  .glass {
+    @apply bg-[#0F1629]/80 backdrop-blur-xl border border-gray-800/40;
+  }
+
+  /* Section divider */
+  .section-title {
+    @apply text-[10px] font-semibold tracking-widest text-gray-500 uppercase;
+  }
+}
+
+/* ===== Custom Scrollbar ===== */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2A3A5A; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #4F8CF7; }
+
+/* ===== Global transition for route changes ===== */
+@layer utilities {
+  .page-enter {
+    animation: pageEnter 0.25s ease-out;
+  }
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Input autofill override ===== */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 30px #0D1322 inset !important;
+  -webkit-text-fill-color: #e2e8f0 !important;
+  caret-color: #e2e8f0;
+}
+
+/* ===== Lightweight Charts ===== */
+.tv-lightweight-charts {
+  --tv-color-platform-background: transparent !important;
+  --tv-color-pane-background: transparent !important;
+}

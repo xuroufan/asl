@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: futures-matching
+  namespace: futures-platform
+  labels:
+    app: futures-matching
+spec:
+  replicas: 3           # 撮合引擎需要多副本
+  selector:
+    matchLabels:
+      app: futures-matching
+  template:
+    metadata:
+      labels:
+        app: futures-matching
+    spec:
+      affinity:
+        podAntiAffinity:    # 反亲和性：不同副本分布在不同的物理节点
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - futures-matching
+                topologyKey: kubernetes.io/hostname
+      containers:
+        - name: matching
+          image: futures-platform/futures-matching:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8082
+          env:
+            - name: JAVA_OPTS
+              value: "-Xms512m -Xmx1g -XX:+UseG1GC -XX:MaxGCPauseMillis=50"
+          resources:
+            requests:
+              cpu: "1000m"
+              memory: "1Gi"
+            limits:
+              cpu: "2000m"
+              memory: "2Gi"

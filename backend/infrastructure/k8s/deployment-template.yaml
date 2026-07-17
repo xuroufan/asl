@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: futures-SERVICE_NAME
+  namespace: futures-platform
+  labels:
+    app: futures-SERVICE_NAME
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: futures-SERVICE_NAME
+  template:
+    metadata:
+      labels:
+        app: futures-SERVICE_NAME
+    spec:
+      containers:
+        - name: SERVICE_NAME
+          image: futures-platform/SERVICE_NAME:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: NACOS_ADDR
+              value: "nacos-service:8848"
+            - name: NACOS_NAMESPACE
+              value: "futures-platform"
+            - name: JAVA_OPTS
+              value: "-Xms256m -Xmx512m -Dspring.classformat.ignore=true"
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: futures-SERVICE_NAME
+  namespace: futures-platform
+spec:
+  selector:
+    app: futures-SERVICE_NAME
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: ClusterIP

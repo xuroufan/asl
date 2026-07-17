@@ -1,0 +1,39 @@
+dataSources:
+  master:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://futures-mysql-master:3306/futures_order?useSSL=false&serverTimezone=Asia/Shanghai
+    username: ${MYSQL_USER:futures}
+    password: ${MYSQL_PASSWORD}
+    maxPoolSize: 20
+  slave_1:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://futures-mysql-slave:3306/futures_order?useSSL=false&serverTimezone=Asia/Shanghai
+    username: ${MYSQL_USER:futures}
+    password: ${MYSQL_PASSWORD}
+    maxPoolSize: 30
+  slave_2:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://futures-mysql-slave2:3306/futures_order?useSSL=false&serverTimezone=Asia/Shanghai
+    username: ${MYSQL_USER:futures}
+    password: ${MYSQL_PASSWORD}
+    maxPoolSize: 30
+
+rules:
+  - !READWRITE_SPLITTING
+    dataSourceGroups:
+      readwrite_ds:
+        writeDataSourceName: master
+        readDataSourceNames: [slave_1, slave_2]
+        loadBalancerName: round_robin
+    loadBalancers:
+      round_robin:
+        type: ROUND_ROBIN
+      random:
+        type: RANDOM
+
+props:
+  sql-show: false
+  check-table-metadata-enabled: false

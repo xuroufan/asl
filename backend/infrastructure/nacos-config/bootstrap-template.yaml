@@ -1,0 +1,42 @@
+# ============================================================
+# 引导配置 - 所有微服务通用模板
+# 放置位置: src/main/resources/bootstrap.yml
+# 注意: bootstrap.yml 在 application.yml 之前加载
+# ============================================================
+
+spring:
+  application:
+    name: futures-SERVICE_NAME          # 【替换为服务名】
+
+  cloud:
+    nacos:
+      config:
+        enabled: true                   # 启用 Nacos 配置中心
+        server-addr: ${NACOS_ADDR:nacos:8848}
+        namespace: ${NACOS_NAMESPACE:futures-platform}
+        group: DEFAULT_GROUP
+        file-extension: yaml
+        refresh-enabled: true           # 配置热更新
+
+        # --- 共享全局配置（所有服务通用） ---
+        shared-configs:
+          - data-id: futures-shared-${spring.profiles.active:dev}.yaml
+            group: GLOBAL_GROUP
+            refresh: true
+
+        # --- 扩展配置（服务级默认值） ---
+        extension-configs:
+          - data-id: futures-SERVICE_NAME.yaml
+            group: SERVICE_GROUP
+            refresh: true
+
+      discovery:
+        enabled: true
+        server-addr: ${NACOS_ADDR:nacos:8848}
+        namespace: ${NACOS_NAMESPACE:futures-platform}
+        heart-beat-interval: 30000
+        heart-beat-retry: 3
+        weight: 1
+
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}

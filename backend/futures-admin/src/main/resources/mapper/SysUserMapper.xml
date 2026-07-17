@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.futures.admin.mapper.SysUserMapper">
+    <select id="selectUserByUsername" resultType="com.futures.admin.entity.SysUser">
+        SELECT u.*, d.dept_name FROM sys_user u LEFT JOIN sys_dept d ON u.dept_id = d.dept_id WHERE u.username = #{username} AND u.deleted = 0
+    </select>
+    <select id="selectUserList" resultType="com.futures.admin.entity.SysUser">
+        SELECT u.*, d.dept_name FROM sys_user u LEFT JOIN sys_dept d ON u.dept_id = d.dept_id WHERE u.deleted = 0
+        <if test="user.username != null and user.username != ''">AND u.username LIKE CONCAT('%', #{user.username}, '%')</if>
+        <if test="user.status != null">AND u.status = #{user.status}</if>
+        ORDER BY u.created_at DESC
+    </select>
+</mapper>

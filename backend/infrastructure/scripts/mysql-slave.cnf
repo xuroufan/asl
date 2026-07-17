@@ -1,0 +1,13 @@
+[mysqld]
+server-id=2
+relay-log=mysql-relay-bin
+log-bin=mysql-bin
+binlog-format=ROW
+gtid_mode=ON
+enforce_gtid_consistency=ON
+read_only=1
+skip-slave-start
+expire_logs_days=30
+max_connections=500
+character-set-server=utf8mb4
+collation-server=utf8mb4_unicode_ci

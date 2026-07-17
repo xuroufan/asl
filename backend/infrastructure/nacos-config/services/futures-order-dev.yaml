@@ -1,0 +1,35 @@
+
+# ============================================================
+# 订单服务 - 开发环境配置
+# Data ID: futures-order-dev.yaml | Group: DEFAULT_GROUP
+# ============================================================
+
+server:
+  port: 8081
+
+futures:
+  order:
+    max-volume-per-order: 999            # 单笔最大手数
+    max-volume-per-day: 10000             # 单日最大开仓手数
+    min-volume-per-order: 1               # 单笔最小手数
+    price-decimal-places: 4               # 价格小数位
+    order-timeout-seconds: 30             # 订单超时时间
+    cancel-after-seconds: 86400           # 未成交订单自动撤单时间(24h)
+    client-order-id-cache-hours: 24       # 幂等性检查缓存时间
+    supported-order-types:                # 支持的订单类型
+      - MARKET
+      - LIMIT
+      - STOP
+      - STOP_LIMIT
+      - BRACKET
+      - TRAILING_STOP
+    supported-time-in-force:
+      - DAY
+      - GTC
+      - IOC
+      - FOK
+
+logging:
+  level:
+    com.futures.order: DEBUG
+    com.futures.order.mapper: TRACE

@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: futures-settlement
+
+  config:
+    import:
+      #  - optional:nacos:
+
+  cloud:
+    nacos:
+      discovery:
+        enabled: false
+        register-enabled: false
+        server-addr: 127.0.0.1:8848
+        username: ${NACOS_USER:nacos}
+        password: ${NACOS_PASSWORD:nacos}
+        namespace: public
+      config:
+        enabled: false
+        server-addr: 127.0.0.1:8848
+        username: ${NACOS_USER:nacos}
+        password: ${NACOS_PASSWORD:nacos}
+        namespace: public
+        group: DEFAULT_GROUP
+        file-extension: yaml
+        refresh-enabled: true
+        import-check:
+          enabled: false
+        shared-configs:
+          - data-id: futures-shared-dev.yaml
+            group: GLOBAL_GROUP
+            refresh: true
+        extension-configs:
+          - data-id: futures-settlement-dev.yaml
+            group: DEFAULT_GROUP
+            refresh: true
+
+  profiles:
+    active: dev

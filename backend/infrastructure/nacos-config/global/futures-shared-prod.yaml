@@ -1,0 +1,62 @@
+# ============================================================
+# 全局共享配置 - 生产环境 (Data ID: futures-shared-prod.yaml)
+# 密码通过环境变量注入，Nacos中不存储明文
+# ============================================================
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:mysql}:${MYSQL_PORT:3306}/${DB_NAME:}?useSSL=true&requireSSL=true&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=false
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:20}
+      minimum-idle: ${DB_MIN_IDLE:5}
+      connection-timeout: 30000
+      max-lifetime: 1200000
+
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD}
+      database: 0
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 4
+
+rocketmq:
+  name-server: ${ROCKETMQ_NS:rocketmq-namesrv:9876}
+  producer:
+    group: futures-producer-group
+    send-message-timeout: 3000
+    retry-times-when-send-failed: 3
+
+seata:
+  enabled: true
+  application-id: ${spring.application.name}
+  tx-service-group: futures_tx_group
+  service:
+    vgroup-mapping:
+      futures_tx_group: default
+    grouplist:
+      default: ${SEATA_ADDR:seata-server:8091}
+  config:
+    type: nacos
+    nacos:
+      server-addr: ${NACOS_ADDR}
+      group: SEATA_GROUP
+
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: assign_id
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

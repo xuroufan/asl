@@ -1,0 +1,98 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: futures-order
+  datasource:
+    url: jdbc:mysql://localhost:3306/futures_order?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8&rewriteBatchedStatements=true
+    username: futures
+    password: ${DB_PASSWORD:futures123}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 30000
+      test-on-borrow: true
+      validation-query: SELECT 1
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      filters: stat,wall
+      connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+  sql:
+    init:
+      mode: never
+  cloud:
+    nacos:
+      enabled: true
+      discovery:
+        enabled: true
+      config:
+        enabled: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ${REDIS_PASSWORD:futures123}
+      database: 0
+      timeout: 3000ms
+      jedis:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 4
+          max-wait: 2000ms
+
+# ============ RocketMQ ============
+rocketmq:
+  # 是否启用 RocketMQ（生产环境设置为 true，需要启动 RocketMQ 服务端）
+  enabled: true
+  name-server: localhost:9876
+  producer:
+    group: order-producer-group
+    send-message-timeout: 3000
+    retry-times-when-send-failed: 2
+  consumer:
+    group: order-consumer-group
+
+seata:
+  enabled: true
+  application-id: futures-order
+  tx-service-group: default_tx_group
+  service:
+    vgroupMapping:
+      default_tx_group: default
+    grouplist:
+      default: 127.0.0.1:8091
+  registry:
+    type: file
+  config:
+    type: file
+
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: assign_id
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+logging:
+  level:
+    com.futures: DEBUG
+    com.futures.order.mapper: TRACE
+
+# ============ Actuator / Prometheus 监控 ============
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    export:
+      prometheus:
+        enabled: true
