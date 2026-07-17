@@ -1,5 +1,5 @@
-import type {
-  LoginRequest, LoginResponse, MarketData, PlaceOrderRequest, Order,
+import type { FuturesSymbol, FuturesQuote,
+  LoginRequest, LoginResponse, FuturesSymbol, FuturesQuote, MarketData, PlaceOrderRequest, Order,
   Position, CandleData, CandleInterval, OrderBookLevel, AccountBalance,
 } from '../types'
 
@@ -74,6 +74,8 @@ export const market = {
     request<CandleData[]>(`/market/kline?symbol=${symbol}&interval=${interval}&limit=${limit}`),
   getOrderBook: (symbol: string, depth = 10) =>
     request<{ bids: OrderBookLevel[]; asks: OrderBookLevel[] }>(`/market/depth?symbol=${symbol}&depth=${depth}`),
+  getSymbols: () => request<FuturesSymbol[]>('/market/symbols'),
+  getQuotes: () => request<Record<string, FuturesQuote>>('/market/all-quotes'),
 }
 
 // ==================== Orders ====================

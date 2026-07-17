@@ -1,4 +1,31 @@
-// ==================== 数据模型 ====================
+
+// ==================== 期货合约数据模型 ====================
+export interface FuturesSymbol {
+  symbol: string
+  name: string
+  exchange: string
+  minTick: number
+  multiplier: number
+}
+
+export interface FuturesQuote {
+  symbol: string
+  bid: number
+  ask: number
+  last: number
+  high: number
+  low: number
+  volume: number
+  change: number
+  changePercent: number
+  timestamp: number
+}
+
+export interface ExchangeGroup {
+  name: string
+  symbols: string[]
+}
+
 
 export interface User {
   id: string

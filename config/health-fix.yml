@@ -1,0 +1,14 @@
+# ===== Health Check Fixes =====
+# Disable health indicators that need Nacos/Seata/Redis servers
+management:
+  health:
+    enabled:
+      nacosDiscovery:
+        enabled: false
+      seata:
+        enabled: false
+      redis:
+        enabled: false
+  endpoint:
+    health:
+      show-details: always
