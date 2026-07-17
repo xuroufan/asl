@@ -20,6 +20,8 @@ spring:
       min-idle: 5
       max-active: 20
       max-wait: 30000
+      validation-query: SELECT 1
+      test-on-borrow: true
   data:
     redis:
       host: localhost
@@ -51,9 +53,18 @@ logging:
     com.futures.admin: DEBUG
     com.futures.admin.mapper: TRACE
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  health:
+    db:
+      enabled: false
+
 # JWT 配置
 jwt:
-  secret: futures-admin-secret-key-2024-rsa-encrypted
+  secret: ${JWT_SECRET:futures-admin-secret-key-2024-rsa-encrypted}
   expiration: 86400000  # 24小时
   refresh-expiration: 604800000  # 7天
 

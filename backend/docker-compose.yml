@@ -22,10 +22,10 @@ services:
     image: mysql:8.0
     container_name: futures-mysql-master
     environment:
-      MYSQL_ROOT_PASSWORD: futures123
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-futures123}
       MYSQL_DATABASE: futures_order
       MYSQL_USER: futures
-      MYSQL_PASSWORD: futures123
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-futures123}
     ports:
       - "3306:3306"
     volumes:
@@ -49,10 +49,10 @@ services:
     image: mysql:8.0
     container_name: futures-mysql-slave
     environment:
-      MYSQL_ROOT_PASSWORD: futures123
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-futures123}
       MYSQL_DATABASE: futures_order
       MYSQL_USER: futures
-      MYSQL_PASSWORD: futures123
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-futures123}
     ports:
       - "3307:3306"
     volumes:
@@ -428,7 +428,7 @@ services:
     container_name: futures-grafana
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=futures123
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-futures123}
       - GF_INSTALL_PLUGINS=grafana-piechart-panel
     volumes:
       - grafana_data:/var/lib/grafana

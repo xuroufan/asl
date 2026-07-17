@@ -34,3 +34,6 @@ events/journal-*.dat
 # Runtime data
 nacos-server/nacos/data/
 nacos-server/nacos/logs/
+
+# SSL private keys (dev-only, regenerate if missing)
+infrastructure/certs/*.key
