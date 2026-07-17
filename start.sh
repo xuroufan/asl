@@ -15,7 +15,8 @@ BACKEND_DIR="$PROJECT_DIR/backend"
 # 健康修复配置
 CFG="--spring.config.additional-location=file:$PROJECT_DIR/config/health-fix.yml"
 # Nacos + Seata 禁用（防止后台线程崩溃）
-NOS="--spring.cloud.nacos.discovery.enabled=false --spring.cloud.nacos.config.enabled=false --seata.enabled=false"
+NOS="--spring.cloud.nacos.discovery.enabled=false --spring.cloud.nacos.config.enabled=false --seata.enabled=false --management.health.enabled.redis.enabled=false"
+REX="--spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration,org.springframework.boot.autoconfigure.data.redis.LettuceConnectionConfiguration"
 # Fund/Push 额外排除
 FPX="--spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,org.apache.rocketmq.spring.autoconfigure.RocketMQAutoConfiguration"
 
@@ -35,23 +36,23 @@ done
 # ============ 停止已有服务 ============
 info "停止已有服务..."
 for s in gateway order admin svc-matching svc-account svc-fund svc-risk svc-market svc-settlement svc-push admin-ui web; do
-    tmux kill-session -t "$s" 2>/dev/null || true
+    tmux kill-session -t "$s"  || true
 done
 
 # ============ 启动 Docker 基础设施 ============
 info "启动 Docker (MySQL, Redis, Prometheus, Grafana)..."
 cd "$PROJECT_DIR"
-docker compose -f docker/dev-infra.yml up -d 2>/dev/null
+docker compose -f docker/dev-infra.yml up -d 
 
 info "等待 MySQL 就绪..."
 for i in $(seq 1 30); do
-    docker ps --format '{{.Names}} {{.Status}}' 2>/dev/null | grep -q "asl-mysql.*healthy" && break
+    docker ps --format '{{.Names}} {{.Status}}'  | grep -q "asl-mysql.*healthy" && break || true
     sleep 2
 done
 
 info "等待 Redis 就绪..."
 for i in $(seq 1 15); do
-    docker ps --format '{{.Names}} {{.Status}}' 2>/dev/null | grep -q "asl-redis.*healthy" && break
+    docker ps --format '{{.Names}} {{.Status}}'  | grep -q "asl-redis.*healthy" && break || true
     sleep 2
 done
 
@@ -68,7 +69,7 @@ info "  admin(8099)"
 
 # matching, account, risk, market, settlement — 带健康修复
 for svc in matching account risk market settlement; do
-    tmux new-session -d -s "svc-$svc" "cd $PROJECT_DIR && $JAVA21 -Xmx256m -jar $BACKEND_DIR/futures-$svc/target/futures-$svc-1.0.0-SNAPSHOT.jar $NOS $CFG 2>&1 | tee $LOG_DIR/$svc.log"
+    tmux new-session -d -s "svc-$svc" "cd $PROJECT_DIR && $JAVA21 -Xmx256m -jar $BACKEND_DIR/futures-$svc/target/futures-$svc-1.0.0-SNAPSHOT.jar $NOS --spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration $CFG 2>&1 | tee $LOG_DIR/$svc.log"
     info "  $svc"
 done
 
@@ -100,15 +101,15 @@ echo ""
 info "===== 系统状态 ====="
 for pair in "8081:order" "8082:matching" "8083:account" "8084:fund" "8085:risk" "8086:market" "8087:settlement" "8093:push" "8099:admin"; do
     p="${pair%%:*}"; n="${pair##*:}"
-    st=$(curl -s -m3 http://localhost:$p/actuator/health 2>/dev/null | python3 -c "import sys,json;print(json.load(sys.stdin).get('status','?'))" 2>/dev/null || echo "starting")
+    st=$(curl -s -m3 http://localhost:$p/actuator/health  | python3 -c "import sys,json;print(json.load(sys.stdin).get('status','?'))"  || echo "starting")
     echo "  $n(:$p) → $st"
 done
 
 echo ""
 info "Gateway API 测试:"
-curl -s -m3 http://localhost:8088/api/v1/market/symbols | python3 -c "import sys,json;d=json.load(sys.stdin);print(f'  Market: {d["code"]} ({len(d["data"])} symbols)')" 2>/dev/null
-curl -s -m3 -H 'X-User-Id: 1' http://localhost:8088/api/v1/trade/positions | python3 -c "import sys,json;d=json.load(sys.stdin);print(f'  Positions: {d["code"]} ({len(d["data"])})')" 2>/dev/null
-curl -s -m3 http://localhost:8088/actuator/health | python3 -c "import sys,json;print(f'  Gateway: {json.load(sys.stdin)["status"]}')" 2>/dev/null
+curl -s -m3 http://localhost:8088/api/v1/market/symbols | python3 -c "import sys,json;d=json.load(sys.stdin);print(f'  Market: {d["code"]} ({len(d["data"])} symbols)')" 
+curl -s -m3 -H 'X-User-Id: 1' http://localhost:8088/api/v1/trade/positions | python3 -c "import sys,json;d=json.load(sys.stdin);print(f'  Positions: {d["code"]} ({len(d["data"])})')" 
+curl -s -m3 http://localhost:8088/actuator/health | python3 -c "import sys,json;print(f'  Gateway: {json.load(sys.stdin)["status"]}')" 
 
 echo ""
 info "===== 访问地址 ====="
