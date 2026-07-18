@@ -1,12 +1,13 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useMarketStore } from '../store/marketStore'
 import { KlineChart } from '../components/KlineChart'
+import { IndicatorPane } from '../components/IndicatorPane'
 import { OrderBook } from '../components/OrderBook'
 import { TradeHistory } from '../components/TradeHistory'
 import { Card } from '../components/ui/Card'
 import { Badge } from '../components/ui/Badge'
 import type { CandleInterval, FuturesSymbol, FuturesQuote } from '../types'
-import { Search, TrendingUp, Globe, RefreshCw } from 'lucide-react'
+import { Search, TrendingUp, Globe, RefreshCw, Star, ChevronDown } from 'lucide-react'
 import { market } from '../api/client'
 import clsx from 'clsx'
 
@@ -34,6 +35,8 @@ export function MarketPage() {
   const [exchangeFilter, setExchangeFilter] = useState<string>('ALL')
   const [search, setSearch] = useState('')
   const pollingRef = useRef<number>()
+  const [showSymbolList, setShowSymbolList] = useState(true)
+  const [activeIndicator, setActiveIndicator] = useState<'MACD' | 'RSI' | null>(null)
 
   // Fetch symbols on mount
   useEffect(() => {
@@ -60,200 +63,206 @@ export function MarketPage() {
     return () => { if (pollingRef.current) clearInterval(pollingRef.current) }
   }, [fetchQuotes])
 
-  // Exchange filter
-  const exchangeGroups = ['ALL', ...new Set(futuresSymbols.map(s => s.exchange))]
-  const filteredSymbols = futuresSymbols.filter(s =>
-    (exchangeFilter === 'ALL' || s.exchange === exchangeFilter) &&
-    (s.symbol.toLowerCase().includes(search.toLowerCase()) ||
-     s.name.toLowerCase().includes(search.toLowerCase()))
-  )
+  // Filtered symbols
+  const exchanges = ['ALL', ...new Set(futuresSymbols.map(s => s.exchange))]
+  const filtered = futuresSymbols.filter(s => {
+    if (exchangeFilter !== 'ALL' && s.exchange !== exchangeFilter) return false
+    if (search) return s.symbol.toLowerCase().includes(search.toLowerCase()) || s.name?.toLowerCase().includes(search.toLowerCase())
+    return true
+  })
 
-  const selectedQuote = quotes[store.selectedSymbol]
-  const selectedSymbolMeta = futuresSymbols.find(s => s.symbol === store.selectedSymbol)
+  const selectedSymbol = futuresSymbols.find(s => s.symbol === store.selectedSymbol)
+  const quote = store.selectedSymbol ? quotes[store.selectedSymbol] : undefined
 
   return (
-    <div className="max-w-lg mx-auto px-4 pt-4 pb-4">
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-3">
-        <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-brand to-blue-500 flex items-center justify-center">
-          <TrendingUp className="w-3.5 h-3.5 text-white" />
+    <div className="max-w-2xl mx-auto px-3 pt-3 pb-20 sm:pb-4">
+      {/* ===== Top bar: selected symbol info ===== */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowSymbolList(!showSymbolList)}
+            className="flex items-center gap-2"
+          >
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-base font-bold">{selectedSymbol?.symbol || '--'}</h1>
+                <ChevronDown className={clsx('w-3.5 h-3.5 text-gray-500 transition-transform', showSymbolList && 'rotate-180')} />
+              </div>
+              <div className="text-[10px] text-gray-600">{selectedSymbol?.name || '选择合约'}</div>
+            </div>
+          </button>
+          {quote && (
+            <div className="flex items-center gap-3">
+              <span className={clsx(
+                'text-xl font-bold font-mono tracking-tight',
+                quote.change >= 0 ? 'text-buy' : 'text-down',
+              )}>
+                {quote.lastPrice.toFixed(2)}
+              </span>
+              <Badge value={quote.change} prefix="" suffix="%" />
+            </div>
+          )}
         </div>
-        <h1 className="text-lg font-bold">期货行情</h1>
-        <button onClick={fetchQuotes} className="ml-auto p-1.5 rounded-lg hover:bg-gray-800 text-gray-500 hover:text-gray-300 transition-colors">
-          <RefreshCw className="w-4 h-4" />
+        <button className="p-2 rounded-lg hover:bg-brand/5 text-gray-500 hover:text-brand transition-colors">
+          <Star className="w-4 h-4" />
         </button>
       </div>
 
-      {/* Exchange filter tabs */}
-      <div className="flex gap-1.5 overflow-x-auto pb-2 -mx-1 px-1 mb-2">
-        {exchangeGroups.map(ex => {
-          const exInfo = exchangeNames[ex]
-          return (
-            <button key={ex}
-              onClick={() => setExchangeFilter(ex)}
-              className={clsx(
-                'px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all',
-                ex === exchangeFilter
-                  ? 'bg-brand/15 text-brand border border-brand/30'
-                  : 'text-gray-500 bg-gray-900/50 border border-transparent hover:text-gray-300 hover:border-gray-700/50',
-              )}
-            >
-              {ex === 'ALL' ? '全部' : (exInfo?.label || ex)}
-            </button>
-          )
-        })}
-      </div>
-
-      {/* Search */}
-      <div className="relative mb-3">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
-        <input
-          className="w-full bg-[#0C1124] border border-gray-800/60 rounded-xl pl-9 pr-3 py-2 text-sm text-gray-300 placeholder:text-gray-600 focus:outline-none focus:border-brand/40 transition-colors"
-          placeholder="搜索合约代码或名称"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-      </div>
-
-      {loadingSymbols ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin w-6 h-6 border-2 border-brand border-t-transparent rounded-full" />
-        </div>
-      ) : (
-        <>
-          {/* Symbol grid */}
-          <div className="grid grid-cols-2 gap-2 mb-3">
-            {filteredSymbols.slice(0, 12).map(sym => {
-              const q = quotes[sym.symbol]
-              const exInfo = exchangeNames[sym.exchange]
-              const change = q?.change ?? 0
-              const isUp = change >= 0
-              const isSelected = store.selectedSymbol === sym.symbol
-              return (
-                <button key={sym.symbol}
-                  onClick={() => store.selectSymbol(sym.symbol)}
+      {/* ===== Collapsible symbol list ===== */}
+      {showSymbolList && (
+        <Card className="mb-3 overflow-hidden animate-fade-in">
+          {/* Search + Filter */}
+          <div className="p-3 border-b border-gray-800/40">
+            <div className="flex items-center gap-2 mb-2.5">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600" />
+                <input
+                  type="text"
+                  placeholder="搜索合约..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  className="w-full bg-ink-light border border-gray-800 rounded-lg pl-9 pr-3 py-2 text-xs text-gray-200 placeholder:text-gray-600 focus:outline-none focus:border-brand/40 transition-colors"
+                />
+              </div>
+              <button
+                onClick={fetchQuotes}
+                className="p-2 rounded-lg hover:bg-brand/5 text-gray-500 hover:text-brand transition-colors"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            {/* Exchange tabs */}
+            <div className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+              {exchanges.map(ex => (
+                <button
+                  key={ex}
+                  onClick={() => setExchangeFilter(ex)}
                   className={clsx(
-                    'relative text-left p-3 rounded-xl transition-all duration-150 border',
-                    isSelected
-                      ? 'bg-brand/8 border-brand/30 shadow-[0_0_20px_-8px_rgba(79,140,247,0.2)]'
-                      : 'bg-[#0F1629] border-gray-800/40 hover:border-gray-700/60',
+                    'shrink-0 px-3 py-1.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] font-medium transition-all min-h-[32px]',
+                    ex === exchangeFilter
+                      ? 'bg-brand/10 text-brand border border-brand/20'
+                      : 'text-gray-500 hover:text-gray-300 bg-transparent border border-transparent',
                   )}
                 >
-                  {/* Exchange badge */}
-                  <span className="inline-flex items-center gap-1 text-[9px] font-medium text-gray-500 mb-1">
-                    <Globe className="w-2.5 h-2.5" />
-                    {exInfo?.label || sym.exchange}
-                  </span>
-                  <div className="flex items-center justify-between">
-                    <span className={clsx('text-sm font-bold', isSelected ? 'text-white' : 'text-gray-200')}>
-                      {sym.symbol}
-                    </span>
-                    {q && (
-                      <span className={clsx('text-xs font-bold', isUp ? 'text-[#FF6B6B]' : 'text-[#00C853]')}>
-                        {isUp ? '+' : ''}{change.toFixed(2)}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-lg font-bold text-white">
-                      {q ? q.last.toFixed(2) : '—'}
-                    </span>
-                    {q && (
-                      <span className={clsx('text-[11px] font-medium px-1.5 py-0.5 rounded', isUp ? 'text-[#FF6B6B] bg-[#FF6B6B]/10' : 'text-[#00C853] bg-[#00C853]/10')}>
-                        {isUp ? '+' : ''}{q.changePercent.toFixed(2)}%
-                      </span>
-                    )}
-                  </div>
-                  {q && <div className="text-[10px] text-gray-600 mt-1">成交量 {q.volume.toLocaleString()}</div>}
+                  {ex === 'ALL' ? '全部' : exchangeNames[ex]?.label || ex}
                 </button>
-              )
-            })}
+              ))}
+            </div>
           </div>
-
-          {/* Selected symbol detail */}
-          {selectedQuote && selectedSymbolMeta && (
-            <>
-              {/* Price banner */}
-              <Card className="p-4 mb-3">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-bold text-white">{store.selectedSymbol}</span>
-                      <span className="text-xs text-gray-500">{selectedSymbolMeta.name}</span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-800 text-gray-500">
-                        {exchangeNames[selectedSymbolMeta.exchange]?.label || selectedSymbolMeta.exchange}
-                      </span>
-                    </div>
-                    <div className="flex items-baseline gap-3">
-                      <span className={clsx('text-2xl font-bold', selectedQuote.change >= 0 ? 'text-[#FF6B6B]' : 'text-[#00C853]')}>
-                        {selectedQuote.last.toFixed(2)}
-                      </span>
-                      <span className={clsx('text-sm font-medium', selectedQuote.change >= 0 ? 'text-[#FF6B6B]' : 'text-[#00C853]')}>
-                        {selectedQuote.change >= 0 ? '+' : ''}{selectedQuote.change.toFixed(2)} ({selectedQuote.changePercent >= 0 ? '+' : ''}{selectedQuote.changePercent.toFixed(2)}%)
-                      </span>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-gray-500">合约乘数</div>
-                    <div className="text-sm font-bold text-gray-300">{selectedSymbolMeta.multiplier}</div>
-                    <div className="text-[10px] text-gray-600 mt-0.5">最小跳动 {selectedSymbolMeta.minTick}</div>
-                  </div>
+          {/* Symbol items */}
+          <div className="max-h-48 overflow-y-auto overscroll-contain divide-y divide-gray-800/20">
+            {loadingSymbols ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-3 p-2.5 animate-pulse">
+                  <div className="h-3 w-20 skeleton rounded" />
+                  <div className="h-3 w-16 skeleton rounded ml-auto" />
                 </div>
-                {/* Bid/Ask row */}
-                <div className="flex gap-4 mt-3 pt-3 border-t border-gray-800/50">
-                  <div>
-                    <span className="text-[10px] text-gray-500">卖一价</span>
-                    <div className="text-sm font-bold text-[#00C853]">{selectedQuote.ask.toFixed(2)}</div>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-gray-500">买一价</span>
-                    <div className="text-sm font-bold text-[#FF6B6B]">{selectedQuote.bid.toFixed(2)}</div>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-gray-500">最高</span>
-                    <div className="text-sm font-medium text-gray-300">{selectedQuote.high.toFixed(2)}</div>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-gray-500">最低</span>
-                    <div className="text-sm font-medium text-gray-300">{selectedQuote.low.toFixed(2)}</div>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Interval selector */}
-              <div className="flex gap-1 mb-2">
-                {intervals.map(i => (
-                  <button key={i.value}
-                    onClick={() => store.selectInterval(i.value)}
+              ))
+            ) : filtered.length === 0 ? (
+              <div className="text-center text-gray-700 py-8 text-xs">无匹配合约</div>
+            ) : (
+              filtered.map(sym => {
+                const q = quotes[sym.symbol]
+                const isSelected = store.selectedSymbol === sym.symbol
+                const change = q ? q.change : 0
+                return (
+                  <button
+                    key={sym.symbol}
+                    onClick={() => { store.selectSymbol(sym.symbol); setShowSymbolList(false) }}
                     className={clsx(
-                      'px-2.5 py-1 rounded text-xs font-medium transition-colors',
-                      i.value === store.selectedInterval
-                        ? 'bg-brand text-white'
-                        : 'text-gray-500 bg-gray-900/50 hover:text-gray-300',
+                      'w-full flex items-center gap-3 p-2.5 transition-colors text-left',
+                      isSelected ? 'bg-brand/5' : 'hover:bg-white/[0.02]',
                     )}
                   >
-                    {i.label}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-medium text-gray-200">{sym.symbol}</span>
+                        <span className="text-[9px] text-gray-600 bg-gray-800/60 rounded px-1 py-0.5">
+                          {exchangeNames[sym.exchange]?.label || sym.exchange}
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-gray-600 truncate mt-0.5">{sym.name}</div>
+                    </div>
+                    {q ? (
+                      <div className="text-right">
+                        <div className={clsx('text-xs font-mono font-medium', change >= 0 ? 'text-buy' : 'text-down')}>
+                          {q.lastPrice.toFixed(2)}
+                        </div>
+                        <div className={clsx('text-[10px] font-mono', change >= 0 ? 'text-buy' : 'text-down')}>
+                          {change >= 0 ? '+' : ''}{change.toFixed(2)}%
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-right">
+                        <div className="text-xs text-gray-600 font-mono">--</div>
+                      </div>
+                    )}
                   </button>
-                ))}
-              </div>
-
-              {/* K-line chart */}
-              <div className="mb-3">
-                <KlineChart data={store.klineData} loading={store.isKlineLoading} />
-              </div>
-
-              {/* Order Book + Trade History */}
-              <div className="grid grid-cols-2 gap-3">
-                <OrderBook bids={store.depthBids} asks={store.depthAsks}
-                  maxBidVol={store.depthBids.reduce((m, b) => Math.max(m, b.quantity), 0)}
-                  maxAskVol={store.depthAsks.reduce((m, a) => Math.max(m, a.quantity), 0)}
-                  currentPrice={selectedQuote?.last ?? 0} />
-                <TradeHistory trades={store.recentTrades} />
-              </div>
-            </>
-          )}
-        </>
+                )
+              })
+            )}
+          </div>
+        </Card>
       )}
+
+      {/* ===== K-line chart area ===== */}
+      <Card className="mb-3 overflow-hidden">
+        {/* Chart header */}
+        <div className="flex items-center justify-between px-3 pt-3 pb-2">
+          <div className="section-title">K线图表</div>
+          <div className="flex gap-1">
+            {intervals.map(int => (
+              <button
+                key={int.value}
+                onClick={() => store.setInterval(int.value)}
+                className={clsx(
+                  'px-2 py-1 rounded-md text-[10px] font-medium transition-all',
+                  store.currentInterval === int.value
+                    ? 'bg-brand/10 text-brand border border-brand/20'
+                    : 'text-gray-600 hover:text-gray-400 border border-transparent',
+                )}
+              >
+                {int.label}
+              </button>
+            ))}
+          </div>
+          {/* Indicator toggles */}
+          <div className="flex gap-1">
+            {(['MACD', 'RSI'] as const).map(ind => (
+              <button
+                key={ind}
+                onClick={() => setActiveIndicator(activeIndicator === ind ? null : ind)}
+                className={'px-2 py-1 rounded-md text-[10px] font-medium transition-all' + (activeIndicator === ind ? ' bg-brand/10 text-brand border border-brand/20' : ' text-gray-600 hover:text-gray-400 border border-transparent')}
+              >
+                {ind}
+              </button>
+            ))}
+          </div>
+        </div>
+        {/* Chart */}
+        <div className="px-2 pb-2">
+          <KlineChart data={store.candles} loading={store.loadingCandles} />
+        </div>
+      </Card>
+
+      {/* Indicator pane */}
+      {activeIndicator && (
+        <Card className="mb-3 overflow-hidden animate-fade-in">
+          <IndicatorPane type={activeIndicator} data={store.candles} />
+        </Card>
+      )}
+    
+      {/* ===== OrderBook + TradeHistory 2-column ===== */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+        <OrderBook
+          bids={store.orderBook?.bids || []}
+          asks={store.orderBook?.asks || []}
+          maxBidVol={store.orderBook?.maxBidVol || 1}
+          maxAskVol={store.orderBook?.maxAskVol || 1}
+          currentPrice={quote?.lastPrice || 0}
+        />
+        <TradeHistory trades={store.recentTrades || []} />
+      </div>
     </div>
   )
 }

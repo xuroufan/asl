@@ -1,126 +1,111 @@
 # ASL — 期货交易平台
 
-全栈期货交易系统，覆盖 Android 交易客户端、Java 微服务后端、运营管理后台和行情 Web 端。基于事件驱动架构和微服务拆分，支持账户管理、行情推送、订单撮合、风控检查、结算清收等核心交易链路。
+全栈期货交易系统。覆盖 Android 交易客户端、Java 微服务后端、运营管理后台和 Web 行情终端。基于事件驱动架构和微服务拆分。
 
-| 模块 | 技术栈 | 说明 |
-|------|--------|------|
-| Android 客户端 | Kotlin, Compose, Hilt, KSP | 交易 App（dev/staging/prod 三环境） |
-| 管理后台前端 | Vue 3, Element Plus, Vite | 运营/风控/财务/CRM 管理界面 |
-| 行情 Web 端 | React, TypeScript, Zustand | K 线图、盘口、交易面板 |
-| 微服务后端 | Java 17, Spring Boot, Maven | 11 个微服务 + API 网关 |
-| 基础设施 | Docker, K8s, Nacos, SkyWalking | 服务治理、可观测性、CI/CD |
+## 架构总览
 
----
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         Android App                             │
+│  Auth → Market → Trading → Positions → Push Notifications      │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │ HTTP/WS
+                    ┌──────▼──────┐
+                    │  API Gateway │   futures-gateway (:8088)
+                    │  JWT Auth   │   Rate Limiting
+                    └──┬───┬───┬──┘
+          ┌────────────┘   │   └──────────────┐
+          ▼                ▼                  ▼
+   ┌──────────┐    ┌────────────┐    ┌──────────────┐
+   │  Auth    │    │   Order    │    │   Matching   │
+   │  Account │    │   Trade    │    │   Disruptor  │
+   │  (:8083) │    │  (:8081)   │    │   (:8082)    │
+   └──────────┘    └─────┬──────┘    └──────────────┘
+                         │               │
+                    ┌────▼──────┐  ┌─────▼──────┐
+                    │   Fund    │  │   Market   │
+                    │  (:8084)  │  │  (:8086)   │
+                    └───────────┘  └────────────┘
+   ┌──────────┐    ┌────────────┐    ┌──────────────┐
+   │   Risk   │    │ Settlement │    │    Push     │
+   │  (:8085) │    │  (:8087)   │    │   WS (:8093)│
+   └──────────┘    └────────────┘    └──────────────┘
 
-## 后端微服务
+   ┌──────────┐
+   │  Admin   │ ◄── Admin UI (Vue 3, :8090)
+   │  (:8099) │
+   └──────────┘
 
-| 服务 | 职责 |
+   Web Terminal (React, :5173) ───► Gateway (:8088)
+```
+
+## 快速启动
+
+```bash
+# 1. 启动基础设施
+open -a Docker                          # 启动 Docker Desktop
+cd backend && docker compose up -d mysql-master redis-master
+
+# 2. 初始化数据库
+docker exec -i futures-mysql-master mysql -u root -pfutures123 \
+  < infrastructure/scripts/init-schema.sql
+
+# 3. 编译并启动服务
+mvn package -Dmaven.test.skip=true -T 4
+bash start.sh start
+
+# 4. 启动前端
+cd ../web       && tmux new-session -d -s web "vite --port 5173 --host"
+cd ../admin-ui  && tmux new-session -d -s admin-ui "vite --port 8090 --host"
+```
+
+或者一键启动：
+```bash
+bash start.sh start
+```
+
+## 服务端口
+
+| 服务 | 端口 | 说明 |
+|------|------|------|
+| futures-order | 8081 | 订单生命周期管理 |
+| futures-matching | 8082 | 撮合引擎 (LMAX Disruptor) |
+| futures-account | 8083 | 账户、认证、KYC |
+| futures-fund | 8084 | 保证金、出入金 |
+| futures-risk | 8085 | 风控检查、强平 |
+| futures-market | 8086 | 行情、K线 |
+| futures-settlement | 8087 | 日终结算 |
+| futures-gateway | 8088 | API 网关、JWT 鉴权 |
+| futures-push | 8093 | WebSocket 推送 |
+| futures-admin | 8099 | 运营管理后台 |
+| Admin UI | 8090 | Vue 3 管理界面 |
+| Web | 5173 | React 行情终端 |
+| Grafana | 3000 | 监控面板 |
+| Prometheus | 9090 | 指标采集 |
+| MySQL | 3306 | 数据库 |
+| Redis | 6379 | 缓存 |
+
+## 技术栈
+
+| 层 | 技术 |
 |------|------|
-| futures-gateway | API 网关、限流、鉴权 |
-| futures-account | 账户管理、认证、KYC、权限 |
-| futures-fund | 资金管理、出入金 |
-| futures-market | 行情接入、K 线聚合 |
-| futures-matching | 订单撮合引擎 |
-| futures-order | 订单生命周期管理 |
-| futures-risk | 风控检查、强平计算 |
-| futures-push | WebSocket 实时推送 |
-| futures-settlement | 日终结算、对账、报表 |
-| futures-admin | 运营后台 API |
-
----
-
-## Android 客户端
-
-### 模块
-
-- `:app` — 主工程，三环境（dev/staging/prod）
-- `:core:network` — 网络层（Retrofit + OkHttp）
-- `:core:database` — 本地持久化（Room）
-- `:core:model` — 数据模型
-- `:core:util` — 通用工具
-- `:feature:auth` — 登录/注册
-- `:feature:market` — 行情展示
-- `:feature:trading` — 交易下单
-- `:feature:position` — 持仓管理
-
-### 构建
-
-```bash
-./gradlew assembleDevDebug         # Dev Debug APK
-./gradlew testDevDebugUnitTest     # 单元测试
-./gradlew lintDevDebug             # 代码检查
-```
-
----
-
-## 前端
-
-```bash
-cd admin-ui && npm install && npm run dev   # 管理后台
-cd web && npm install && npm run dev        # 行情 Web 端
-```
-
----
-
-## 基础设施
-
-```bash
-docker compose -f docker/dev-infra.yml up -d
-```
-
-- **Nacos** — 服务注册发现 & 配置中心
-- **RocketMQ** — 异步消息 & 事件驱动
-- **Sentinel** — 流量控制 & 熔断降级
-- **Seata** — 分布式事务
-- **SkyWalking** — 链路追踪 & APM
-- **Prometheus + Grafana** — 监控告警
-
----
-
-## CI/CD
-
-GitHub Actions 自动运行 CI（push/PR 到 main）：lint → 单元测试 → 构建 Debug APK。自动备份每 10 小时执行一次。
-
----
+| Android | Kotlin, Jetpack Compose, Hilt, Retrofit |
+| Web | React 19, TypeScript, Tailwind CSS, Zustand |
+| Admin | Vue 3, Element Plus, ECharts, Pinia |
+| 后端 | Java 21, Spring Boot 3.2, Spring Cloud Gateway |
+| 数据库 | MySQL 8.0, Redis 7, MyBatis-Plus |
+| 消息 | RocketMQ, LMAX Disruptor |
+| 监控 | Prometheus, Grafana, ELK |
+| 容器 | Docker, GHCR |
 
 ## 文档
 
-详细文档见 [`docs/`](docs/) 目录，涵盖混沌工程、数据库优化、JVM 调优、微服务治理、可观测性。
-
----
-
-## 项目结构
-
-```
-.
-├── app/                          # Android 主工程
-├── core/                         # Android 核心模块（network/database/model/util）
-├── feature/                      # Android 功能模块（auth/market/trading/position）
-├── backend/                      # Java 微服务后端（11 个服务）
-│   ├── futures-account/
-│   ├── futures-admin/
-│   ├── futures-common/
-│   ├── futures-fund/
-│   ├── futures-gateway/
-│   ├── futures-market/
-│   ├── futures-matching/
-│   ├── futures-order/
-│   ├── futures-push/
-│   ├── futures-risk/
-│   ├── futures-settlement/
-│   └── infrastructure/           # 基础设施配置
-├── admin-ui/                     # 管理后台 (Vue 3 + Element Plus)
-├── web/                          # 行情 Web 端 (React + TypeScript)
-├── docker/                       # Docker 编排
-├── docs/                         # 全量文档
-├── events/                       # 事件日志
-├── .github/workflows/            # CI/CD 流水线
-├── build.gradle.kts              # Android 根构建脚本
-└── settings.gradle.kts           # Android 模块配置
-```
-
----
-
-## 许可证
-
-[MIT](LICENSE)
+| 文档 | 说明 |
+|------|------|
+| [架构说明](docs/ARCHITECTURE.md) | 系统架构、数据流、事件驱动 |
+| [部署指南](docs/DEPLOYMENT.md) | 从零到生产的完整部署步骤 |
+| [API 文档](docs/API.md) | 网关路由、认证、WebSocket 协议 |
+| [优化记录](docs/optimization-checklist.md) | Nacos、JVM、数据库优化历史 |
+| [运维工具](tools/) | 备份、压测、构建、健康监控 |
+| [Knife4j UI](http://localhost:8099/doc.html) | 管理后台 API 交互文档 (112 端点) |
+| [健康监控](health.html) | 实时服务状态页面 |

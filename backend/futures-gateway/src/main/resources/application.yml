@@ -44,10 +44,18 @@ spring:
         uri: http://localhost:8087
         predicates:
         - Path=/api/v1/settlement/**
+      - id: position-route
+        uri: http://localhost:8081
+        predicates:
+        - Path=/api/v1/position/**
       - id: push-route
         uri: http://localhost:8093
         predicates:
         - Path=/api/v1/push/**
+      - id: ws-route
+        uri: http://localhost:8093
+        predicates:
+        - Path=/ws/**
       - id: trade-route
         uri: http://localhost:8081
         predicates:

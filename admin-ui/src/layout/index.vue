@@ -1,13 +1,10 @@
 <template>
-  <div class="layout-container">
+  <div class="admin-app">
     <el-container style="height: 100vh">
-      <!-- 侧边栏 -->
       <Sidebar />
       <el-container>
-        <!-- 顶部导航栏 -->
         <Navbar />
-        <!-- 主内容区 -->
-        <el-main style="background: #f5f7fa; padding: 20px; overflow-y: auto">
+        <el-main class="admin-main">
           <router-view />
         </el-main>
       </el-container>
@@ -21,7 +18,15 @@ import Navbar from './Navbar.vue'
 </script>
 
 <style scoped>
-.layout-container {
+.admin-app {
   height: 100vh;
+  display: flex;
+  background: #080C1A;
+  color: #CBD5E1;
+}
+.admin-main {
+  background: #0A0F1E;
+  padding: 20px;
+  overflow-y: auto;
 }
 </style>

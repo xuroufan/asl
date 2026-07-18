@@ -433,6 +433,7 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
       - ./infrastructure/scripts/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
+      - ./infrastructure/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
     ports:
       - "3000:3000"
     depends_on:

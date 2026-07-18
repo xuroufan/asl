@@ -13,32 +13,32 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ref={ref}
       disabled={disabled || loading}
       className={clsx(
-        'inline-flex items-center justify-center rounded-lg font-semibold transition-all duration-150',
+        'inline-flex items-center justify-center rounded-xl font-semibold transition-all duration-150',
         'disabled:opacity-40 disabled:cursor-not-allowed',
+        'hover:scale-[1.02] active:scale-[0.98]',
         {
-          'bg-brand text-white hover:bg-brand-dark active:bg-brand-dark': variant === 'primary',
-          'bg-buy text-white hover:bg-red-500 active:bg-red-500': variant === 'danger',
-          'bg-sell text-white hover:bg-green-500 active:bg-green-500': variant === 'success',
-          'bg-transparent text-gray-300 hover:text-white hover:bg-white/5': variant === 'ghost',
-          'border border-gray-700 text-gray-300 hover:text-white hover:border-gray-500': variant === 'outline',
+          'bg-brand text-white hover:bg-brand-dark active:bg-brand-dark shadow-sm hover:shadow-[0_0_20px_-5px_rgba(79,140,247,0.3)]': variant === 'primary',
+          'text-gray-400 hover:text-gray-200 bg-transparent hover:bg-white/[0.04]': variant === 'ghost',
+          'border border-gray-700 hover:border-gray-600 text-gray-300 hover:text-white bg-transparent': variant === 'outline',
         },
         {
-          'px-3 py-1.5 text-sm gap-1.5': size === 'sm',
-          'px-5 py-2.5 text-sm gap-2': size === 'md',
-          'px-6 py-3 text-base gap-2': size === 'lg',
+          'text-xs px-2.5 py-1.5 gap-1': size === 'sm',
+          'text-sm px-4 py-2.5 gap-1.5': size === 'md',
+          'text-base px-6 py-3 gap-2': size === 'lg',
         },
+        loading && 'relative !text-transparent',
         className,
       )}
       {...props}
     >
       {loading && (
-        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-        </svg>
+        <span className="absolute inset-0 flex items-center justify-center">
+          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        </span>
       )}
       {children}
     </button>
   ),
 )
+
 Button.displayName = 'Button'

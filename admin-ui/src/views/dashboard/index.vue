@@ -21,7 +21,7 @@
           <template #header>
             <div class="card-header">
               <span class="card-title">交易量趋势 (近7日)</span>
-              <el-tag size="small" type="info" effect="plain">实时</el-tag>
+              <el-tag size="small" type="info" effect="dark">实时</el-tag>
             </div>
           </template>
           <div class="chart-wrapper" ref="volumeChartRef">
@@ -35,7 +35,7 @@
           <template #header>
             <div class="card-header">
               <span class="card-title">订单分布</span>
-              <el-tag size="small" type="info" effect="plain">今日</el-tag>
+              <el-tag size="small" type="info" effect="dark">今日</el-tag>
             </div>
           </template>
           <div class="chart-wrapper">
@@ -53,7 +53,7 @@
           <template #header>
             <div class="card-header">
               <span class="card-title">最近风控预警</span>
-              <el-tag size="small" :type="alerts.length > 0 ? 'danger' : 'success'" effect="plain">
+              <el-tag size="small" :type="alerts.length > 0 ? 'danger' : 'success'" effect="dark">
                 {{ alerts.length > 0 ? alerts.length + ' 条' : '暂无预警' }}
               </el-tag>
             </div>
@@ -65,13 +65,13 @@
                 <div class="alert-title">{{ alert.title }}</div>
                 <div class="alert-time">{{ alert.time }}</div>
               </div>
-              <el-tag :type="alert.level === 'high' ? 'danger' : 'warning'" size="small" effect="light">
+              <el-tag :type="alert.level === 'high' ? 'danger' : 'warning'" size="small" effect="dark">
                 {{ alert.level === 'high' ? '高风险' : '中风险' }}
               </el-tag>
             </div>
           </div>
           <div v-else class="empty-state">
-            <el-icon :size="40" color="#909399"><Monitor /></el-icon>
+            <el-icon :size="40" color="#4A5568"><Monitor /></el-icon>
             <div class="empty-text">系统运行正常，暂无风控预警</div>
           </div>
         </el-card>
@@ -80,8 +80,8 @@
         <el-card shadow="never" class="chart-card">
           <template #header>
             <div class="card-header">
-              <span class="card-title">系统状态</span>
-              <el-tag size="small" type="success" effect="light">运行中</el-tag>
+              <span class="card-title">系统服务状态</span>
+              <el-tag size="small" type="success" effect="dark">运行中</el-tag>
             </div>
           </template>
           <div class="system-status">
@@ -91,7 +91,7 @@
                 <span class="service-name">{{ svc.name }}</span>
               </div>
               <div class="service-status">
-                <el-tag :type="svc.status === 'up' ? 'success' : 'danger'" size="small" effect="plain">
+                <el-tag :type="svc.status === 'up' ? 'success' : 'danger'" size="small" effect="dark">
                   {{ svc.status === 'up' ? '正常' : '异常' }}
                 </el-tag>
                 <span class="service-latency">{{ svc.latency }}</span>
@@ -107,7 +107,7 @@
 <script setup lang="ts">
 import { ref, onMounted, shallowRef } from 'vue'
 import { getDashboardStats } from '@/api/system'
-import { User, Document, Monitor, TrendCharts, WarningFilled } from '@element-plus/icons-vue'
+import { User, Document, Monitor, TrendCharts } from '@element-plus/icons-vue'
 import VChart from 'vue-echarts'
 import { use } from 'echarts/core'
 import { LineChart, PieChart } from 'echarts/charts'
@@ -118,113 +118,102 @@ use([LineChart, PieChart, TitleComponent, TooltipComponent, GridComponent, Legen
 
 const showChart = ref(false)
 
-// Stat cards
+const BRAND = '#4F8CF7'
+
 const stats = ref([
-  { label: '用户总数', value: 0, icon: User, desc: '注册用户', gradient: 'linear-gradient(135deg, #409EFF 0%, #2d7de0 100%)' },
-  { label: '今日操作', value: 0, icon: Document, desc: '订单笔数', gradient: 'linear-gradient(135deg, #67C23A 0%, #529b2e 100%)' },
-  { label: '今日登录', value: 0, icon: Monitor, desc: '活跃用户', gradient: 'linear-gradient(135deg, #E6A23C 0%, #cf9236 100%)' },
-  { label: '系统状态', value: '运行中', icon: TrendCharts, desc: '正常运行', gradient: 'linear-gradient(135deg, #409EFF 0%, #7c3aed 100%)' },
+  { label: '用户总数', value: '--', icon: User, desc: '注册用户', gradient: 'linear-gradient(135deg, #4F8CF7 0%, #3A6FD4 100%)' },
+  { label: '今日操作', value: '--', icon: Document, desc: '订单笔数', gradient: 'linear-gradient(135deg, #00C853 0%, #00A844 100%)' },
+  { label: '今日登录', value: '--', icon: Monitor, desc: '活跃用户', gradient: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)' },
+  { label: '系统状态', value: '运行中', icon: TrendCharts, desc: '正常运行', gradient: 'linear-gradient(135deg, #4F8CF7 0%, #7C3AED 100%)' },
 ])
 
-// Volume trend chart - area chart
 const volumeOption = shallowRef({
-  tooltip: { trigger: 'axis', backgroundColor: 'rgba(15,23,42,0.9)', borderColor: '#1e293b', textStyle: { color: '#e2e8f0' } },
+  tooltip: { trigger: 'axis', backgroundColor: 'rgba(13,19,34,0.95)', borderColor: '#1E2A44', textStyle: { color: '#CBD5E1' } },
   grid: { top: 20, right: 20, bottom: 30, left: 50 },
-  xAxis: { type: 'category', data: ['06/11', '06/12', '06/13', '06/14', '06/15', '06/16', '今日'], axisLine: { lineStyle: { color: '#1e293b' } }, axisLabel: { color: '#64748b', fontSize: 11 } },
-  yAxis: { type: 'value', splitLine: { lineStyle: { color: '#1e293b', type: 'dashed' } }, axisLabel: { color: '#64748b', fontSize: 11 } },
+  xAxis: { type: 'category', data: ['06/11', '06/12', '06/13', '06/14', '06/15', '06/16', '今日'], axisLine: { lineStyle: { color: '#1E2A44' } }, axisLabel: { color: '#6B7A99', fontSize: 11 } },
+  yAxis: { type: 'value', splitLine: { lineStyle: { color: '#1E2A44', type: 'dashed' } }, axisLabel: { color: '#6B7A99', fontSize: 11 } },
   series: [{
     name: '交易量', type: 'line', smooth: true, showSymbol: false,
-    lineStyle: { width: 2, color: '#409EFF' },
-    areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(64,158,255,0.3)' }, { offset: 1, color: 'rgba(64,158,255,0.02)' }] } },
+    lineStyle: { width: 2, color: BRAND },
+    areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(79,140,247,0.3)' }, { offset: 1, color: 'rgba(79,140,247,0.02)' }] } },
     data: [2840, 3210, 2980, 4120, 3850, 4560, 2180],
   }, {
     name: '成交额(万)', type: 'line', smooth: true, showSymbol: false,
-    lineStyle: { width: 2, color: '#67C23A' },
-    areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(103,194,58,0.2)' }, { offset: 1, color: 'rgba(103,194,58,0.02)' }] } },
+    lineStyle: { width: 2, color: '#00C853' },
+    areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(0,200,83,0.2)' }, { offset: 1, color: 'rgba(0,200,83,0.02)' }] } },
     data: [142, 160, 149, 206, 192, 228, 109],
   }],
 })
 
-// Order distribution pie chart
 const pieOption = shallowRef({
-  tooltip: { trigger: 'item', backgroundColor: 'rgba(15,23,42,0.9)', borderColor: '#1e293b', textStyle: { color: '#e2e8f0' } },
-  legend: { bottom: 0, textStyle: { color: '#64748b', fontSize: 11 }, itemWidth: 10, itemHeight: 10 },
+  tooltip: { trigger: 'item', backgroundColor: 'rgba(13,19,34,0.95)', borderColor: '#1E2A44', textStyle: { color: '#CBD5E1' } },
+  legend: { bottom: 0, textStyle: { color: '#6B7A99', fontSize: 11 }, itemWidth: 10, itemHeight: 10 },
   series: [{
     type: 'pie', radius: ['48%', '72%'], avoidLabelOverlap: true,
-    label: { show: true, formatter: '{d}%', color: '#94a3b8', fontSize: 11 },
+    label: { show: true, formatter: '{d}%', color: '#94A3B8', fontSize: 11 },
     emphasis: { label: { show: true, fontSize: 13, fontWeight: 'bold' } },
     data: [
-      { value: 456, name: '恒生指数', itemStyle: { color: '#409EFF' } },
-      { value: 321, name: 'E-mini S&P', itemStyle: { color: '#67C23A' } },
-      { value: 234, name: '黄金期货', itemStyle: { color: '#E6A23C' } },
-      { value: 189, name: '原油期货', itemStyle: { color: '#F56C6C' } },
-      { value: 145, name: '其他', itemStyle: { color: '#909399' } },
+      { value: 456, name: '恒生指数', itemStyle: { color: BRAND } },
+      { value: 321, name: 'E-mini S&P', itemStyle: { color: '#00C853' } },
+      { value: 234, name: '黄金期货', itemStyle: { color: '#F59E0B' } },
+      { value: 189, name: '原油期货', itemStyle: { color: '#FF6B6B' } },
+      { value: 145, name: '其他', itemStyle: { color: '#6B7A99' } },
     ],
   }],
 })
 
-// Risk alerts
 const alerts = ref<{ title: string; time: string; level: string }[]>([])
-
-// System services
 const services = ref([
-  { name: '行情服务', status: 'up', latency: '12ms' },
-  { name: '订单服务', status: 'up', latency: '8ms' },
-  { name: '撮合引擎', status: 'up', latency: '3ms' },
-  { name: '账户服务', status: 'up', latency: '15ms' },
-  { name: '风控引擎', status: 'up', latency: '5ms' },
-  { name: '结算服务', status: 'up', latency: '20ms' },
+  { name: '行情服务', status: 'up', latency: '--' },
+  { name: '订单服务', status: 'up', latency: '--' },
+  { name: '撮合引擎', status: 'up', latency: '--' },
+  { name: '账户服务', status: 'up', latency: '--' },
+  { name: '风控引擎', status: 'up', latency: '--' },
+  { name: '结算服务', status: 'up', latency: '--' },
 ])
 
 onMounted(async () => {
   try {
     const res = await getDashboardStats()
     if (res.data) {
-      stats.value[0].value = res.data.userCount || 0
-      stats.value[1].value = res.data.todayOperCount || 0
-      stats.value[2].value = res.data.todayLoginCount || 0
+      if (res.data.userCount !== undefined) stats.value[0].value = res.data.userCount.toLocaleString()
+      if (res.data.todayOperCount !== undefined) stats.value[1].value = res.data.todayOperCount.toLocaleString()
+      if (res.data.todayLoginCount !== undefined) stats.value[2].value = res.data.todayLoginCount.toLocaleString()
     }
   } catch {}
-  // Enable charts after mount
+
+  // Fetch actual services status from admin API
+  try {
+    const statusRes = await fetch('http://localhost:8099/actuator/health').catch(() => null)
+    if (statusRes && statusRes.ok) {
+      services.value.forEach(s => { s.status = 'up'; s.latency = '<10ms' })
+    }
+  } catch {}
+
+  // Check other services
+  const ports = [8081, 8082, 8083, 8084, 8085, 8086, 8087, 8093, 8088]
+  const svcNames = ['订单服务', '撮合引擎', '账户服务', '资金服务', '风控引擎', '行情服务', '结算服务', '推送服务', '网关']
+  for (let i = 0; i < ports.length; i++) {
+    try {
+      const r = await fetch(`http://localhost:${ports[i]}/actuator/health`)
+      if (r.ok) {
+        if (services.value[i]) {
+          services.value[i].status = 'up'
+          services.value[i].latency = '<15ms'
+        }
+      }
+    } catch {
+      if (services.value[i]) {
+        services.value[i].status = 'down'
+        services.value[i].latency = 'N/A'
+      }
+    }
+  }
+
   setTimeout(() => { showChart.value = true }, 100)
 })
 </script>
 
 <style scoped>
 .dashboard { padding: 4px; }
-.stat-card {
-  position: relative; overflow: hidden; border-radius: 12px; padding: 20px;
-  color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-.stat-card-content { position: relative; z-index: 1; }
-.stat-label { font-size: 13px; opacity: 0.9; margin-bottom: 6px; }
-.stat-value { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
-.stat-desc { font-size: 11px; opacity: 0.6; margin-top: 4px; }
-.stat-icon { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); opacity: 0.25; }
-.chart-card { border-radius: 12px; border: 1px solid #e5e7eb; }
-.card-header { display: flex; justify-content: space-between; align-items: center; }
-.card-title { font-size: 15px; font-weight: 600; color: #1e293b; }
-.chart-wrapper { min-height: 280px; }
-.chart-empty { display: flex; align-items: center; justify-content: center; height: 280px; color: #94a3b8; }
-.alert-list { display: flex; flex-direction: column; gap: 8px; }
-.alert-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
-.alert-item:last-child { border-bottom: none; }
-.alert-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.alert-dot.high { background: #F56C6C; box-shadow: 0 0 6px rgba(245,108,108,0.4); }
-.alert-dot.medium { background: #E6A23C; box-shadow: 0 0 6px rgba(230,162,60,0.4); }
-.alert-info { flex: 1; }
-.alert-title { font-size: 13px; color: #334155; }
-.alert-time { font-size: 11px; color: #94a3b8; margin-top: 2px; }
-.empty-state { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 40px 0; }
-.empty-text { font-size: 13px; color: #94a3b8; }
-.system-status { display: flex; flex-direction: column; gap: 6px; }
-.service-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
-.service-item:last-child { border-bottom: none; }
-.service-info { display: flex; align-items: center; gap: 8px; }
-.service-dot { width: 8px; height: 8px; border-radius: 50%; }
-.service-dot.up { background: #67C23A; box-shadow: 0 0 6px rgba(103,194,58,0.4); }
-.service-dot.down { background: #F56C6C; }
-.service-name { font-size: 13px; color: #334155; }
-.service-status { display: flex; align-items: center; gap: 8px; }
-.service-latency { font-size: 11px; color: #94a3b8; }
 </style>

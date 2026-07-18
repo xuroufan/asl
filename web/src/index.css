@@ -5,12 +5,17 @@
 @layer base {
   * { @apply border-gray-800; }
   body {
-    @apply bg-[#080C1A] text-gray-100 antialiased;
+    @apply bg-ink text-gray-100 antialiased;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
       'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
     overflow-x: hidden;
   }
   ::selection { background: rgba(79,140,247,0.3); color: #fff; }
+
+  /* Typography scale */
+  h1 { @apply text-xl font-bold tracking-tight; }
+  h2 { @apply text-lg font-semibold; }
+  h3 { @apply text-base font-semibold; }
 }
 
 @layer components {
@@ -26,24 +31,77 @@
   .card-gradient {
     @apply bg-gradient-to-b from-[#0D1322] to-[#0A0F1E];
   }
+  .card-ghost {
+    @apply bg-transparent border border-dashed border-gray-800/40 rounded-2xl;
+  }
 
-  .text-up { @apply text-[#FF6B6B]; }
-  .text-down { @apply text-[#00C853]; }
-  .bg-up { @apply bg-[#FF6B6B]/10; }
-  .bg-down { @apply bg-[#00C853]/10; }
+  .text-up { @apply text-buy; }
+  .text-down { @apply text-sell; }
+
+  .badge-up { @apply inline-flex items-center bg-buy/10 text-buy rounded px-1.5 py-0.5 text-xs font-medium; }
+  .badge-down { @apply inline-flex items-center bg-sell/10 text-sell rounded px-1.5 py-0.5 text-xs font-medium; }
+  .badge-neutral { @apply inline-flex items-center bg-gray-800 text-gray-400 rounded px-1.5 py-0.5 text-xs font-medium; }
 
   .glass {
     @apply bg-[#0D1322]/70 backdrop-blur-xl border border-gray-800/30;
+  }
+  .glass-strong {
+    @apply bg-[#0D1322]/85 backdrop-blur-2xl border border-gray-800/40;
   }
 
   .section-title {
     @apply text-[10px] font-semibold tracking-widest text-gray-600 uppercase;
   }
 
-  /* Brand gradient */
+  /* Brand gradient text */
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-brand to-blue-400;
   }
+
+  /* Skeleton loader */
+  .skeleton {
+    @apply relative overflow-hidden rounded-lg bg-ink-light;
+  }
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0;
+    background: linear-gradient(90deg, transparent 0%, rgba(79,140,247,0.04) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s ease-in-out infinite;
+  }
+
+  /* Panel divider */
+  .panel-divider {
+    @apply w-px bg-gradient-to-b from-transparent via-gray-800/60 to-transparent;
+  }
+
+  /* Data row for lists */
+  .data-row {
+    @apply flex justify-between items-center py-2 border-b border-gray-800/30 last:border-0;
+  }
+  .data-label {
+    @apply text-xs text-gray-500;
+  }
+  .data-value {
+    @apply text-xs font-medium text-gray-200 font-mono;
+  }
+
+  /* Price change indicator */
+  .price-change {
+    @apply inline-flex items-center gap-0.5 transition-colors duration-300;
+  }
+}
+
+/* ===== Animated background ===== */
+.bg-ambient {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse at 15% 20%, rgba(79,140,247,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 80%, rgba(255,107,107,0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(0,200,83,0.02) 0%, transparent 50%);
 }
 
 /* ===== Custom Scrollbar ===== */
@@ -52,32 +110,18 @@
 ::-webkit-scrollbar-thumb { background: #1E2A44; border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: #4F8CF7; }
 
-/* ===== Page enter animation ===== */
-@layer utilities {
-  .page-enter {
-    animation: pageEnter 0.25s ease-out;
-  }
-}
-
+/* ===== Page transition ===== */
 @keyframes pageEnter {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
-/* ===== Skeleton loading ===== */
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-.skeleton {
-  background: linear-gradient(90deg, #0D1322 25%, #151E36 50%, #0D1322 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+.page-enter {
+  animation: pageEnter 0.25s ease-out;
 }
 
-/* ===== Pulse dot ===== */
+/* ===== Pulse dot (3 dots) ===== */
 @keyframes pulse-dot {
-  0%, 100% { opacity: 0.4; }
+  0%, 100% { opacity: 0.3; }
   50% { opacity: 1; }
 }
 .pulse-dot {
@@ -99,4 +143,39 @@ input:-webkit-autofill:focus {
 .tv-lightweight-charts {
   --tv-color-platform-background: transparent !important;
   --tv-color-pane-background: transparent !important;
+}
+
+/* ===== Number font for all data displays ===== */
+.font-number {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* ===== Mobile touch optimizations ===== */
+.overscroll-contain {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+.touch-pan-x {
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+}
+
+/* Minimum touch target for mobile (44px = Apple HIG) */
+.min-h-touch {
+  min-height: 44px;
+}
+.min-w-touch {
+  min-width: 44px;
+}
+
+/* Mobile active state (replaces hover on touch) */
+@media (hover: none) and (pointer: coarse) {
+  .touch-active:active {
+    opacity: 0.7;
+    transform: scale(0.97);
+  }
+  button, a, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
 }

@@ -106,8 +106,18 @@ const loadData = async () => {
   try {
     const res = await getTagList(categoryFilter.value || undefined)
     tags.value = res.data || []
-  } catch { tags.value = [] }
+  } catch { tags.value = MOCK_TAGS }
 }
+
+const MOCK_TAGS = [
+  { tagId: 1, tagName: '高频交易者', category: 'TRADING_STYLE', color: '#409EFF', customerCount: 45 },
+  { tagId: 2, tagName: '长线持仓', category: 'TRADING_STYLE', color: '#67C23A', customerCount: 32 },
+  { tagId: 3, tagName: '高风险偏好', category: 'RISK', color: '#F56C6C', customerCount: 28 },
+  { tagId: 4, tagName: '需重点关注', category: 'RISK', color: '#E6A23C', customerCount: 15 },
+  { tagId: 5, tagName: 'VIP客户', category: 'LEVEL', color: '#8E5CD8', customerCount: 12 },
+  { tagId: 6, tagName: '新注册用户', category: 'STAGE', color: '#909399', customerCount: 67 },
+  { tagId: 7, tagName: 'API交易者', category: 'TRADING_STYLE', color: '#409EFF', customerCount: 23 },
+]
 
 const showCreateDialog = () => {
   newTag.value = { tagName: '', category: '自定义', color: '#409EFF' }

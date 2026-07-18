@@ -3,7 +3,8 @@ package com.futures.order.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.futures.common.result.PageResult;
 import com.futures.common.result.Result;
-import com.futures.common.util.JwtUtil;
+import com.futures.order.security.JwtTokenUtil;
+import lombok.RequiredArgsConstructor;
 import com.futures.order.dto.OrderCancelRequest;
 import com.futures.order.dto.OrderPlaceRequest;
 import com.futures.order.dto.OrderVO;
@@ -24,13 +25,13 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+    private final JwtTokenUtil jwtTokenUtil;
 
     /** 从 header 提取 userId，优先 X-User-Id，其次 JWT */
     private Long resolveUserId(Long headerUserId, String authHeader) {
         if (headerUserId != null) return headerUserId;
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            Long id = JwtUtil.getUserId(authHeader.substring(7));
-            if (id != null) return id;
+            try { return jwtTokenUtil.getUserIdFromToken(authHeader.substring(7)); } catch (Exception e) { return null; }
         }
         return null;
     }

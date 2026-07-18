@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>ASL API 文档</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#080C1A;color:#CBD5E1;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:40px}
+.container{max-width:800px;margin:0 auto}
+h1{font-size:24px;font-weight:700;background:linear-gradient(135deg,#4F8CF7,#7AACFF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.sub{color:#6B7A99;font-size:13px;margin-bottom:32px}
+h2{font-size:14px;color:#6B7A99;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;margin-top:32px}
+.card{background:#0D1322;border:1px solid #1E2A44;border-radius:12px;padding:16px;margin-bottom:12px;transition:all 0.2s}
+.card:hover{border-color:#2A3A5C}
+.card h3{font-size:14px;font-weight:600;margin-bottom:4px}
+.card .url{font-size:11px;color:#4F8CF7;font-family:monospace;margin-bottom:8px}
+.card .desc{font-size:12px;color:#6B7A99;margin-bottom:8px}
+.card .links{display:flex;gap:8px}
+.card .links a{background:rgba(79,140,247,0.1);border:1px solid rgba(79,140,247,0.2);color:#4F8CF7;padding:4px 12px;border-radius:6px;font-size:11px;text-decoration:none}  
+.card .links a:hover{background:rgba(79,140,247,0.2)}
+.footer{text-align:center;color:#4A5568;font-size:11px;margin-top:40px;padding-top:20px;border-top:1px solid #1E2A44}
+</style></head>
+<body>
+<div class="container">
+  <h1>ASL 期货平台 · API 文档</h1>
+  <div class="sub">所有微服务 OpenAPI 接口文档，可通过 Knife4j / Swagger UI 浏览</div>
+
+  <h2>管理后台</h2>
+  <div class="card">
+    <h3>Admin API (futures-admin)</h3>
+    <div class="url">port 8099 · 系统管理、用户、权限、风控、运营</div>
+    <div class="links">
+      <a href="http://localhost:8099/doc.html" target="_blank">Knife4j UI</a>
+      <a href="http://localhost:8099/swagger-ui/index.html" target="_blank">Swagger UI</a>
+      <a href="http://localhost:8099/v3/api-docs" target="_blank">OpenAPI JSON</a>
+    </div>
+  </div>
+
+  <h2>核心服务</h2>
+  <div class="card">
+    <h3>撮合引擎 (futures-matching)</h3>
+    <div class="url">port 8082 · 订单簿、深度、下单、撤单</div>
+    <div class="desc">POST /api/v1/matching/place · GET /api/v1/matching/depth · GET /api/v1/matching/price</div>
+  </div>
+  <div class="card">
+    <h3>订单服务 (futures-order)</h3>
+    <div class="url">port 8081 · 订单管理、成交查询</div>
+  </div>
+  <div class="card">
+    <h3>账户服务 (futures-account)</h3>
+    <div class="url">port 8083 · 用户认证、KYC、2FA、权限</div>
+  </div>
+  <div class="card">
+    <h3>资金服务 (futures-fund)</h3>
+    <div class="url">port 8084 · 保证金、出入金、资金流水</div>
+  </div>
+  <div class="card">
+    <h3>风控引擎 (futures-risk)</h3>
+    <div class="url">port 8085 · 前置风控、日内风险、限仓</div>
+  </div>
+  <div class="card">
+    <h3>行情服务 (futures-market)</h3>
+    <div class="url">port 8086 · 实时行情、K线、深度</div>
+  </div>
+  <div class="card">
+    <h3>结算服务 (futures-settlement)</h3>
+    <div class="url">port 8087 · 每日结算、交割、报表</div>
+  </div>
+  <div class="card">
+    <h3>推送服务 (futures-push)</h3>
+    <div class="url">port 8093 · WebSocket 连接、离线消息</div>
+  </div>
+
+  <h2>基础设施</h2>
+  <div class="card">
+    <h3>API网关 (futures-gateway)</h3>
+    <div class="url">port 8088 · 统一入口、路由转发、限流</div>
+  </div>
+  <div class="card">
+    <h3>监控</h3>
+    <div class="url">
+      <a href="http://localhost:9090" target="_blank" style="color:#4F8CF7;text-decoration:none">Prometheus (9090)</a>
+      &nbsp;·&nbsp;
+      <a href="http://localhost:3000" target="_blank" style="color:#4F8CF7;text-decoration:none">Grafana (3000)</a>
+    </div>
+  </div>
+
+  <div class="footer">
+    系统运行中 · <a href="../health.html" style="color:#4F8CF7;text-decoration:none">健康监控</a>
+  </div>
+</div>
+</body>
+</html>

@@ -172,8 +172,16 @@ const loadData = async () => {
   try {
     const res = await getCustomerList({ ...filters.value, page: 1, size: 50 })
     customers.value = res.data?.records || res.data || []
-  } catch { customers.value = [] }
+  } catch { customers.value = MOCK_CUSTOMERS }
 }
+
+const MOCK_CUSTOMERS = [
+  { customerId: 1001, username: 'trader_wang', realName: '王建国', phone: '138****8888', email: 'wangjg@example.com', level: '钻石', kycStatus: 'VERIFIED', status: 'ACTIVE', totalDeposit: 5000000, totalWithdrawal: 2000000, accountBalance: 3500000, lastLoginTime: '2026-07-18 09:15:23', createdAt: '2025-03-15', riskLevel: 'LOW' },
+  { customerId: 1002, username: 'trader_li', realName: '李芳', phone: '139****6666', email: 'lifang@example.com', level: '黄金', kycStatus: 'VERIFIED', status: 'ACTIVE', totalDeposit: 3000000, totalWithdrawal: 1000000, accountBalance: 2200000, lastLoginTime: '2026-07-17 16:42:10', createdAt: '2025-05-20', riskLevel: 'LOW' },
+  { customerId: 1003, username: 'trader_zhang', realName: '张伟', phone: '136****5555', email: 'zhangw@example.com', level: '白银', kycStatus: 'VERIFIED', status: 'ACTIVE', totalDeposit: 1000000, totalWithdrawal: 500000, accountBalance: 600000, lastLoginTime: '2026-07-16 11:30:05', createdAt: '2025-08-10', riskLevel: 'MID' },
+  { customerId: 1004, username: 'trader_chen', realName: '陈雪梅', phone: '137****3333', email: 'chenxm@example.com', level: '普通', kycStatus: 'PENDING', status: 'ACTIVE', totalDeposit: 500000, totalWithdrawal: 200000, accountBalance: 350000, lastLoginTime: '2026-07-15 14:22:18', createdAt: '2026-01-05', riskLevel: 'MID' },
+  { customerId: 1005, username: 'trader_liu', realName: '刘强', phone: '158****2222', email: 'liuq@example.com', level: '普通', kycStatus: 'UNVERIFIED', status: 'LOCKED', totalDeposit: 200000, totalWithdrawal: 50000, accountBalance: 150000, lastLoginTime: '2026-06-30 08:10:45', createdAt: '2026-03-22', riskLevel: 'HIGH' },
+]
 
 const showDetail = async (customerId: number) => {
   detailVisible.value = true

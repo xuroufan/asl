@@ -1,0 +1,10 @@
+apiVersion: 1
+providers:
+  - name: 'Futures Platform'
+    orgId: 1
+    folder: '期货平台'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards

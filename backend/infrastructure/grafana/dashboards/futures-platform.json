@@ -1,0 +1,15 @@
+{
+  "title": "ASL 期货平台 · 系统监控",
+  "tags": ["futures", "asl"],
+  "timezone": "Asia/Shanghai",
+  "editable": true,
+  "refresh": "10s",
+  "schemaVersion": 38,
+  "panels": [
+    {"title":"系统概览","type":"stat","gridPos":{"h":4,"w":24,"x":0,"y":0},"targets":[{"expr":"count(up == 1)","legendFormat":"服务UP数"}]},
+    {"title":"JVM堆内存","type":"graph","gridPos":{"h":8,"w":12,"x":0,"y":4},"targets":[{"expr":"sum(jvm_memory_used_bytes{area='heap'}) by (instance)","legendFormat":"{{instance}}"}]},
+    {"title":"HTTP请求P99延迟","type":"graph","gridPos":{"h":8,"w":12,"x":12,"y":4},"targets":[{"expr":"histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket[1m])) by (le, instance))","legendFormat":"{{instance}}"}]},
+    {"title":"GC暂停","type":"graph","gridPos":{"h":6,"w":8,"x":0,"y":12},"targets":[{"expr":"rate(jvm_gc_pause_seconds_sum[1m])","legendFormat":"{{instance}}"}]},
+    {"title":"CPU使用率","type":"gauge","gridPos":{"h":6,"w":8,"x":8,"y":12},"targets":[{"expr":"rate(process_cpu_seconds_total[1m])*100","legendFormat":"CPU%"}]}
+  ]
+}

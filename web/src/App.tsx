@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
+import { TranslationProvider } from './i18n/useTranslation'
 import { Layout } from './components/Layout'
 import { LoginPage } from './pages/LoginPage'
 import { MarketPage } from './pages/MarketPage'
@@ -15,6 +16,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
+    <TranslationProvider>
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
@@ -33,5 +35,6 @@ export default function App() {
         <Route path="*" element={<Navigate to="/market" replace />} />
       </Routes>
     </BrowserRouter>
+    </TranslationProvider>
   )
 }

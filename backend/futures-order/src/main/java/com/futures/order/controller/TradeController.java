@@ -1,7 +1,7 @@
 package com.futures.order.controller;
 
 import com.futures.common.result.Result;
-import com.futures.common.util.JwtUtil;
+import com.futures.order.security.JwtTokenUtil;
 import com.futures.order.dto.ClosePositionRequest;
 import com.futures.order.dto.OrderVO;
 import com.futures.order.dto.PositionVO;
@@ -30,13 +30,13 @@ public class TradeController {
 
     private final OrderService orderService;
     private final OrderMapper orderMapper;
+    private final JwtTokenUtil jwtTokenUtil;
 
     /** 从 header 提取 userId */
     private Long resolveUserId(Long headerUserId, String authHeader) {
         if (headerUserId != null) return headerUserId;
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            Long id = JwtUtil.getUserId(authHeader.substring(7));
-            if (id != null) return id;
+            try { return jwtTokenUtil.getUserIdFromToken(authHeader.substring(7)); } catch (Exception e) { return null; }
         }
         return null;
     }
