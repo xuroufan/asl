@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useMarketStore } from '../store/marketStore'
+import { MarketChartSkeleton, CardSkeleton } from '../components/LoadingSkeleton'
 import { KlineChart } from '../components/KlineChart'
 import { IndicatorPane } from '../components/IndicatorPane'
 import { OrderBook } from '../components/OrderBook'
@@ -152,12 +153,7 @@ export function MarketPage() {
           {/* Symbol items */}
           <div className="max-h-48 overflow-y-auto overscroll-contain divide-y divide-gray-800/20">
             {loadingSymbols ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-3 p-2.5 animate-pulse">
-                  <div className="h-3 w-20 skeleton rounded" />
-                  <div className="h-3 w-16 skeleton rounded ml-auto" />
-                </div>
-              ))
+              <CardSkeleton rows={5} />
             ) : filtered.length === 0 ? (
               <div className="text-center text-gray-700 py-8 text-xs">无匹配合约</div>
             ) : (

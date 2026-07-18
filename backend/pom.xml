@@ -50,6 +50,8 @@
         <sentinel.version>1.8.7</sentinel.version>
         <seata.version>1.8.0</seata.version>
         <rocketmq.version>5.2.0</rocketmq.version>
+        <micrometer.version>1.12.12</micrometer.version>
+        <rocketmq-starter.version>2.3.1</rocketmq-starter.version>
 
         <mybatis-plus.version>3.5.6</mybatis-plus.version>
         <mysql-connector.version>8.4.0</mysql-connector.version>
@@ -177,6 +179,11 @@
                 <groupId>org.apache.rocketmq</groupId>
                 <artifactId>rocketmq-client</artifactId>
                 <version>${rocketmq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-spring-boot-starter</artifactId>
+                <version>${rocketmq-starter.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

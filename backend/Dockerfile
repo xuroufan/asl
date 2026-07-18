@@ -23,6 +23,7 @@ ARG SERVICE_PORT=8080
 LABEL maintainer="futures-platform" service="futures-${SERVICE}"
 
 RUN groupadd -r futures && useradd -r -g futures -m -d /app futures
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 

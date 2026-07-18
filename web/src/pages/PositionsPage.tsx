@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { usePositionStore } from '../store/positionStore'
+import { ListSkeleton } from '../components/LoadingSkeleton'
 import { PositionCard } from '../components/PositionCard'
 import { Card } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
