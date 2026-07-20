@@ -54,3 +54,9 @@ health.html
 rebuilded_up.py
 skills-lock.json
 watchdog.sh
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
