@@ -5,7 +5,7 @@
 @layer base {
   * { @apply border-gray-800; }
   body {
-    @apply bg-ink text-gray-100 antialiased;
+    @apply bg-[#080C1A] text-gray-100 antialiased;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
       'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
     overflow-x: hidden;
@@ -60,7 +60,7 @@
 
   /* Skeleton loader */
   .skeleton {
-    @apply relative overflow-hidden rounded-lg bg-ink-light;
+    @apply relative overflow-hidden rounded-lg bg-[#1A2744];
   }
   .skeleton::after {
     content: '';

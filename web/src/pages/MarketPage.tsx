@@ -9,6 +9,7 @@ import { Card } from '../components/ui/Card'
 import { Badge } from '../components/ui/Badge'
 import type { CandleInterval, FuturesSymbol, FuturesQuote } from '../types'
 import { Search, TrendingUp, Globe, RefreshCw, Star, ChevronDown } from 'lucide-react'
+import { useMarketWebSocket } from '../hooks/useMarketWebSocket'
 import { market } from '../api/client'
 import clsx from 'clsx'
 
@@ -37,6 +38,7 @@ export function MarketPage() {
   const [search, setSearch] = useState('')
   const pollingRef = useRef<number>()
   const [showSymbolList, setShowSymbolList] = useState(true)
+  useMarketWebSocket()
   const [activeIndicator, setActiveIndicator] = useState<'MACD' | 'RSI' | null>(null)
 
   // Fetch symbols on mount

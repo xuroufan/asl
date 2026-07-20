@@ -7,6 +7,12 @@ spring:
     name: futures-gateway
   cloud:
     gateway:
+      default-filters:
+      - name: RequestRateLimiter
+        args:
+          redis-rate-limiter.replenishRate: 200
+          redis-rate-limiter.burstCapacity: 400
+          key-resolver: "#{@userIdKeyResolver}"
       routes:
       - id: auth-route
         uri: http://localhost:8083
@@ -96,3 +102,11 @@ management:
     export:
       prometheus:
         enabled: true
+
+# SSL (生产环境启用)
+  ssl:
+    enabled: false
+    key-store: classpath:keystore.p12
+    key-store-password: changeit
+    key-store-type: PKCS12
+    key-alias: futures

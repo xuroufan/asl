@@ -28,15 +28,29 @@ out/
 __pycache__/
 .env
 *.keystore
+*.p12
 !debug.keystore
+*.p12
 **/build/
 .kotlin/
 
 # Keystore / signing keys
 *.keystore
+*.p12
 *.jks
 release.keystore
+*.p12
 
 # Event journals (root level)
 events/journal-*.dat
 backend/infrastructure/certs/
+
+# Transient/generated files
+.agents/
+admin-ui/node_modules/
+admin-ui/dist/
+backups/
+health.html
+rebuilded_up.py
+skills-lock.json
+watchdog.sh

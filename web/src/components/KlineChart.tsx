@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo } from 'react'
+import { useEffect, useRef } from 'react'
 import { createChart, ColorType, type IChartApi, type ISeriesApi, type CandlestickSeriesPartialOptions, type HistogramSeriesPartialOptions } from 'lightweight-charts'
 import type { CandleData } from '../types'
 
@@ -7,7 +7,9 @@ interface KlineChartProps {
   loading?: boolean
 }
 
-export function KlineChart({ data, loading }: KlineChartProps) {
+import React from 'react'
+
+export const KlineChart = React.memo(function KlineChart({ data, loading }: KlineChartProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const chartRef = useRef<IChartApi | null>(null)
   const candleSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null)

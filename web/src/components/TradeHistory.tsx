@@ -5,7 +5,9 @@ interface TradeHistoryProps {
   trades: MarketTrade[]
 }
 
-export function TradeHistory({ trades }: TradeHistoryProps) {
+import React from 'react'
+
+export const TradeHistory = React.memo(function TradeHistory({ trades }: TradeHistoryProps) {
   return (
     <div className="card p-3">
       <div className="section-title mb-2.5 px-1">成交记录</div>

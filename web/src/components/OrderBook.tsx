@@ -9,7 +9,9 @@ interface OrderBookProps {
   currentPrice: number
 }
 
-export function OrderBook({ bids, asks, maxBidVol, maxAskVol, currentPrice }: OrderBookProps) {
+import React from 'react'
+
+export const OrderBook = React.memo(function OrderBook({ bids, asks, maxBidVol, maxAskVol, currentPrice }: OrderBookProps) {
   return (
     <div className="card p-3">
       <div className="section-title mb-2.5 px-1">盘口深度</div>

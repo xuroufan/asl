@@ -1,6 +1,3 @@
-import { useMarketStore } from '../store/marketStore'
-import { useAuthStore } from '../store/authStore'
-import type { WSMessage } from '../types'
 
 let ws: WebSocket | null = null
 let reconnectTimer: ReturnType<typeof setTimeout> | null = null
